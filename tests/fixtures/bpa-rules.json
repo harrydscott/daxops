@@ -1,0 +1,83 @@
+[
+  {
+    "ID": "META_AVOID_FLOAT",
+    "Name": "Do not use floating point data types",
+    "Category": "Metadata",
+    "Description": "Use Decimal instead of Double",
+    "Severity": 3,
+    "Scope": "DataColumn, CalculatedColumn",
+    "Expression": "DataType = \"Double\"",
+    "FixExpression": "DataType = DataType.Decimal",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "APPLY_FORMAT_STRING_MEASURES",
+    "Name": "Provide format string for visible numeric measures",
+    "Category": "Formatting",
+    "Description": "Visible measures should have a format string",
+    "Severity": 2,
+    "Scope": "Measure",
+    "Expression": "IsVisible and string.IsNullOrWhitespace(FormatString)",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "APPLY_FORMAT_STRING_COLUMNS",
+    "Name": "Provide format string for visible numeric columns",
+    "Category": "Formatting",
+    "Description": "Visible numeric columns should have a format string",
+    "Severity": 2,
+    "Scope": "DataColumn, CalculatedColumn",
+    "Expression": "IsVisible and string.IsNullOrWhitespace(FormatString)",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "META_SUMMARIZE_NONE",
+    "Name": "Don't summarize numeric columns",
+    "Category": "Metadata",
+    "Description": "Set SummarizeBy to None for numeric columns",
+    "Severity": 1,
+    "Scope": "DataColumn, CalculatedColumn",
+    "Expression": "IsVisible and SummarizeBy <> \"None\"",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "LAYOUT_COLUMNS_HIERARCHIES_DF",
+    "Name": "Organize columns in display folders",
+    "Category": "Model Layout",
+    "Description": "Tables with many columns should use display folders",
+    "Severity": 1,
+    "Scope": "Table",
+    "Expression": "Columns.Count(IsVisible and string.IsNullOrEmpty(DisplayFolder)) > 10",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "DAX_TODO",
+    "Name": "Revisit TODO expressions",
+    "Category": "DAX Expressions",
+    "Description": "Expressions containing TODO should be revisited",
+    "Severity": 1,
+    "Scope": "Measure, CalculatedColumn",
+    "Expression": "Expression.IndexOf(\"TODO\") >= 0",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "DAX_DIVISION_COLUMNS",
+    "Name": "Avoid division operator",
+    "Category": "DAX Expressions",
+    "Description": "Use DIVIDE() instead of /",
+    "Severity": 3,
+    "Scope": "Measure, CalculatedColumn",
+    "Expression": "Tokenize().Any(Type = DIV)",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "UNMAPPED_RULE_EXAMPLE",
+    "Name": "Some complex LINQ rule",
+    "Category": "Advanced",
+    "Description": "This rule requires Dynamic LINQ and can't be mapped",
+    "Severity": 2,
+    "Scope": "Measure",
+    "Expression": "DependsOn.Any(Key.ObjectType = \"Column\")",
+    "CompatibilityLevel": 1200
+  }
+]
