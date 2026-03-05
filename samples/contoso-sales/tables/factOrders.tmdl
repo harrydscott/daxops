@@ -1,0 +1,44 @@
+table factOrders
+	lineageTag: a1b2c3d4-0005
+
+	column order_id
+		dataType: string
+		lineageTag: c-040
+
+	column order_status
+		dataType: string
+		lineageTag: c-041
+
+	column ship_date
+		dataType: string
+		lineageTag: c-042
+
+	column delivery_date
+		dataType: string
+		lineageTag: c-043
+
+	column freight_cost
+		dataType: decimal
+		lineageTag: c-044
+
+	column OrderKey
+		dataType: int64
+		lineageTag: c-045
+
+	measure 'Open Orders' = CALCULATE(COUNTROWS(factOrders), factOrders[order_status] = "Open")
+		lineageTag: m-030
+
+	measure 'Avg Delivery Days' = AVERAGEX(factOrders, DATEDIFF(factOrders[ship_date], factOrders[delivery_date], DAY))
+		lineageTag: m-031
+
+	measure 'Total Freight' = SUM(factOrders[freight_cost])
+		lineageTag: m-032
+
+	partition factOrders = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				factOrders = Source{[Schema="dbo",Item="FactOrders"]}[Data]
+			in
+				factOrders

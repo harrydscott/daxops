@@ -1,0 +1,48 @@
+table dimCustomer
+	lineageTag: a1b2c3d4-0002
+
+	column 'Customer ID'
+		dataType: int64
+		isHidden
+		lineageTag: c-010
+
+	column customer_name
+		dataType: string
+		lineageTag: c-011
+
+	column customer_email
+		dataType: string
+		lineageTag: c-012
+
+	column City
+		dataType: string
+		lineageTag: c-013
+
+	column Country
+		dataType: string
+		lineageTag: c-014
+
+	column 'Customer Segment'
+		dataType: string
+		lineageTag: c-015
+
+	column customerSince
+		dataType: dateTime
+		lineageTag: c-016
+
+	/// Count of unique customers who placed orders
+	measure 'Customer Count' = DISTINCTCOUNT(Sales[Customer ID])
+		formatString: #,##0
+		lineageTag: m-010
+
+	measure 'New Customers' = CALCULATE([Customer Count], FILTER(dimCustomer, dimCustomer[customerSince] >= DATE(2024, 1, 1)))
+		lineageTag: m-011
+
+	partition dimCustomer = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				dimCustomer = Source{[Schema="dbo",Item="DimCustomer"]}[Data]
+			in
+				dimCustomer

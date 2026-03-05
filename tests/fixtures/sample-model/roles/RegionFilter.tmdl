@@ -1,0 +1,3 @@
+role RegionFilter
+	tablePermission Store =
+		[Region] = USERNAME()

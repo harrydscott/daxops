@@ -1,0 +1,41 @@
+/// Date dimension — one row per calendar day
+table Date
+	lineageTag: a1b2c3d4-0004
+
+	column Date
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: c-030
+
+	column Year
+		dataType: int64
+		lineageTag: c-031
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: c-032
+
+	column 'Month Number'
+		dataType: int64
+		lineageTag: c-033
+
+	column Quarter
+		dataType: string
+		lineageTag: c-034
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: c-035
+
+	column 'Is Weekend'
+		dataType: boolean
+		lineageTag: c-036
+
+	partition Date = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				Date = Source{[Schema="dbo",Item="DimDate"]}[Data]
+			in
+				Date

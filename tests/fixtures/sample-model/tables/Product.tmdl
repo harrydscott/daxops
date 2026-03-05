@@ -1,0 +1,51 @@
+/// Product dimension — one row per product SKU
+table Product
+	lineageTag: a1b2c3d4-0003
+
+	column 'Product ID'
+		dataType: int64
+		isHidden
+		lineageTag: c-020
+
+	/// The display name of the product
+	column 'Product Name'
+		dataType: string
+		lineageTag: c-021
+
+	column Category
+		dataType: string
+		lineageTag: c-022
+
+	column Subcategory
+		dataType: string
+		lineageTag: c-023
+
+	column 'Unit Price'
+		dataType: decimal
+		formatString: £#,##0.00
+		lineageTag: c-024
+
+	column 'Unit Cost'
+		dataType: decimal
+		lineageTag: c-025
+
+	/// Gross margin percentage per product
+	measure 'Margin %' = DIVIDE(SUM(Sales[Net Amount]) - SUMX(Sales, Sales[Quantity] * RELATED(Product[Unit Cost])), SUM(Sales[Net Amount]), 0)
+		formatString: 0.0%
+		displayFolder: Profitability
+		lineageTag: m-020
+
+	/// Total cost of goods sold
+	measure COGS = SUMX(Sales, Sales[Quantity] * RELATED(Product[Unit Cost]))
+		formatString: £#,##0
+		displayFolder: Profitability
+		lineageTag: m-021
+
+	partition Product = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				Product = Source{[Schema="dbo",Item="Product"]}[Data]
+			in
+				Product

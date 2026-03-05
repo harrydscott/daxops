@@ -1,0 +1,16 @@
+relationship rel-001
+	fromColumn: Sales.'Customer ID'
+	toColumn: dimCustomer.'Customer ID'
+
+relationship rel-002
+	fromColumn: Sales.'Product ID'
+	toColumn: Product.'Product ID'
+
+relationship rel-003
+	fromColumn: Sales.'Order Date'
+	toColumn: Date.Date
+
+relationship rel-004
+	fromColumn: factOrders.order_id
+	toColumn: Sales.'Order ID'
+	crossFilteringBehavior: bothDirections

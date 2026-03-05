@@ -1,0 +1,36 @@
+table Store
+	lineageTag: a1b2c3d4-0006
+
+	column StoreKey
+		dataType: int64
+		lineageTag: c-050
+
+	column 'Store Name'
+		dataType: string
+		lineageTag: c-051
+
+	column Region
+		dataType: string
+		lineageTag: c-052
+
+	column 'Store Type'
+		dataType: string
+		lineageTag: c-053
+
+	column 'Square Footage'
+		dataType: int64
+		lineageTag: c-054
+
+	/// Number of active stores
+	measure 'Store Count' = COUNTROWS(Store)
+		formatString: #,##0
+		lineageTag: m-040
+
+	partition Store = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				Store = Source{[Schema="dbo",Item="Store"]}[Data]
+			in
+				Store
