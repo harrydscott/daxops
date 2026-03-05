@@ -6,7 +6,7 @@
 
 **Semantic model lifecycle tool for Power BI / Microsoft Fabric.**
 
-DaxOps scores your TMDL models for AI readiness, runs health checks for DAX anti-patterns and missing metadata, generates documentation with LLMs, and diffs model versions semantically.
+DaxOps scores your TMDL models for AI readiness, runs health checks for DAX anti-patterns and missing metadata, generates documentation with LLMs, diffs model versions semantically, imports BPA rules, and generates badges.
 
 ## Installation
 
@@ -32,7 +32,7 @@ pip install -e ".[dev]"
 daxops score ./my-model/
 daxops score ./my-pbip-project/
 
-# Run health checks
+# Run health checks (with summary dashboard + recommendations)
 daxops check ./my-model/
 
 # JSON output for CI/CD pipelines
@@ -44,6 +44,9 @@ daxops report ./my-model/ --format html
 
 # Diff two model versions
 daxops diff ./model-v1/ ./model-v2/
+
+# Compare two versions (before/after improvement report)
+daxops compare ./model-v1/ ./model-v2/
 
 # Auto-generate descriptions with LLM
 daxops document ./my-model/ --provider openai --model gpt-4o
@@ -58,6 +61,17 @@ daxops fix ./my-model/              # apply changes
 # Save current findings as baseline — future checks only show new issues
 daxops baseline ./my-model/
 daxops check ./my-model/            # only new findings shown
+
+# Run measure tests
+daxops test ./my-model/ tests.yaml
+daxops test ./my-model/ tests.yaml --reference ref-data.json
+
+# Import Tabular Editor BPA rules
+daxops bpa ./my-model/ BPARules.json
+
+# Generate SVG badge for README
+daxops badge ./my-model/ -o badge.svg
+daxops badge ./my-model/ --style score --format json
 
 # Create a sample model to try it out
 daxops init ./sample/
@@ -128,11 +142,13 @@ DaxOps evaluates your semantic model across three tiers:
 
 | Tier | Criteria | Pass Threshold | Focus |
 |------|----------|---------------|-------|
-| 🥉 Bronze | 7 criteria | ≥10/14 | Naming, types, format strings, descriptions |
-| 🥈 Silver | 7 criteria | ≥10/14 + Bronze | Table/column descriptions, display folders, synonyms |
-| 🥇 Gold | 6 criteria | ≥8/12 + Silver | AI instructions, verified answers, cross-references |
+| Bronze | 7 criteria | >=10/14 | Naming, types, format strings, descriptions |
+| Silver | 7 criteria | >=10/14 + Bronze | Table/column descriptions, display folders, synonyms |
+| Gold | 6 criteria | >=8/12 + Silver | AI instructions, verified answers, cross-references |
 
 ## Health Checks
+
+Each finding includes a specific fix recommendation.
 
 | Rule | Severity | What it checks |
 |------|----------|---------------|
@@ -146,6 +162,76 @@ DaxOps evaluates your semantic model across three tiers:
 | `BIDIRECTIONAL_RELATIONSHIP` | WARNING | Bidirectional cross-filtering |
 | `MISSING_DISPLAY_FOLDER` | INFO | Measures without display folders |
 | `COLUMN_COUNT` | WARNING | Tables with >30 visible columns |
+
+## Measure Testing
+
+Define expected outputs for your DAX measures and validate them:
+
+```yaml
+# tests.yaml
+tests:
+  - measure: "Total Revenue"
+    expected: 125000.50
+    description: "Total revenue across all sales"
+    tolerance: 0.01
+  - measure: "Avg Order Value"
+    expected: 250.00
+    filter_context:
+      Product.Category: "Electronics"
+    tolerance: 1.0
+```
+
+```bash
+# Static validation (measure exists, expression valid, filter columns exist)
+daxops test ./my-model/ tests.yaml
+
+# Compare against reference data
+daxops test ./my-model/ tests.yaml --reference reference-data.json
+
+# JSON output
+daxops test ./my-model/ tests.yaml --format json
+```
+
+## BPA Rules Import
+
+Import [Tabular Editor Best Practice Analyzer](https://github.com/TabularEditor/BestPracticeRules) rules and run them as health checks:
+
+```bash
+# Download official BPA rules
+curl -O https://raw.githubusercontent.com/TabularEditor/BestPracticeRules/master/BPARules-PowerBI.json
+
+# Run BPA rules against your model
+daxops bpa ./my-model/ BPARules-PowerBI.json
+daxops bpa ./my-model/ BPARules-PowerBI.json --format json
+```
+
+Currently mapped BPA rules: `META_AVOID_FLOAT`, `APPLY_FORMAT_STRING_MEASURES`, `APPLY_FORMAT_STRING_COLUMNS`, `META_SUMMARIZE_NONE`, `LAYOUT_COLUMNS_HIERARCHIES_DF`, `DAX_TODO`, `DAX_DIVISION_COLUMNS`. Unmapped rules (requiring Dynamic LINQ) are reported transparently.
+
+## Badge Generation
+
+Generate SVG badges for your README showing model tier status:
+
+```bash
+# Simple tier badge (Bronze/Silver/Gold)
+daxops badge ./my-model/ -o badge.svg
+
+# Detailed score badge
+daxops badge ./my-model/ --style score -o badge.svg
+
+# JSON tier info
+daxops badge ./my-model/ --format json
+```
+
+## Comparison Report
+
+Compare two model versions to track improvement over time:
+
+```bash
+daxops compare ./model-v1/ ./model-v2/
+daxops compare ./model-v1/ ./model-v2/ --format json
+```
+
+Shows score deltas, new/resolved findings, and whether the model improved or regressed.
 
 ## Watch Mode
 
