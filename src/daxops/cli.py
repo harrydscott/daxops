@@ -14,7 +14,18 @@ from daxops import __version__
 console = Console()
 
 
-@click.group()
+class DaxOpsGroup(click.Group):
+    def invoke(self, ctx):
+        try:
+            return super().invoke(ctx)
+        except SystemExit:
+            raise
+        except Exception as e:
+            console.print(f"[red]Error: {e}")
+            sys.exit(2)
+
+
+@click.group(cls=DaxOpsGroup)
 @click.version_option(__version__)
 def cli():
     """DaxOps — Semantic Model Lifecycle Tool for Power BI / Microsoft Fabric."""
@@ -34,25 +45,30 @@ def score(model_path: str, fmt: str):
     silver = score_silver(model)
     gold = score_gold(model)
 
+    b = sum(c.score for c in bronze)
+    s = sum(c.score for c in silver)
+    g = sum(c.score for c in gold)
+    summary = {
+        "bronze_score": b, "silver_score": s, "gold_score": g,
+        "bronze_pass": b >= 10, "silver_pass": b >= 10 and s >= 10,
+        "gold_pass": b >= 10 and s >= 10 and g >= 8,
+    }
+
     if fmt == "json":
         data = {
             tier: [{"name": c.name, "score": c.score, "max": c.max_score, "details": c.details}
                    for c in criteria]
             for tier, criteria in [("bronze", bronze), ("silver", silver), ("gold", gold)]
         }
-        b = sum(c.score for c in bronze)
-        s = sum(c.score for c in silver)
-        g = sum(c.score for c in gold)
-        data["summary"] = {
-            "bronze_score": b, "silver_score": s, "gold_score": g,
-            "bronze_pass": b >= 10, "silver_pass": b >= 10 and s >= 10,
-            "gold_pass": b >= 10 and s >= 10 and g >= 8,
-        }
+        data["summary"] = summary
         click.echo(json.dumps(data, indent=2))
     elif fmt == "markdown":
         click.echo(generate_score_report(bronze, silver, gold))
     else:
         _render_score_terminal(bronze, silver, gold)
+
+    if not summary["bronze_pass"]:
+        sys.exit(1)
 
 
 def _render_score_terminal(bronze, silver, gold):
@@ -125,9 +141,8 @@ def check(model_path: str, fmt: str, severity: str | None):
                 )
             console.print(table)
 
-    # Exit code: 1 if errors found
-    errors = [f for f in findings if f.severity.value == "ERROR"]
-    if errors:
+    # Exit code: 1 if any findings (warnings or errors)
+    if findings:
         sys.exit(1)
 
 
