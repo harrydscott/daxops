@@ -1,0 +1,14 @@
+tests:
+  - measure: "Total Revenue"
+    expected: 125000.50
+    description: "Total revenue across all sales"
+    tolerance: 0.01
+  - measure: "Avg Order Value"
+    expected: 250.00
+    description: "Average order value"
+    filter_context:
+      Product.Category: "Electronics"
+    tolerance: 1.0
+  - measure: "NonExistent Measure"
+    expected: 0
+    description: "Should error - measure doesn't exist"
