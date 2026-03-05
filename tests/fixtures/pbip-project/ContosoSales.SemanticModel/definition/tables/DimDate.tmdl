@@ -1,0 +1,19 @@
+table DimDate
+	lineageTag: pbip-002
+
+	column Date
+		dataType: dateTime
+		lineageTag: pdc-001
+
+	column Year
+		dataType: int64
+		lineageTag: pdc-002
+
+	partition DimDate = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				DimDate = Source{[Schema="dbo",Item="DimDate"]}[Data]
+			in
+				DimDate

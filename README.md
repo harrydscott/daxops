@@ -28,8 +28,9 @@ pip install -e ".[dev]"
 ## Quick Start
 
 ```bash
-# Score a model's AI readiness
+# Score a model's AI readiness (accepts raw TMDL folder or .pbip project)
 daxops score ./my-model/
+daxops score ./my-pbip-project/
 
 # Run health checks
 daxops check ./my-model/
@@ -49,6 +50,24 @@ daxops document ./my-model/ --provider openai --model gpt-4o
 
 # Create a sample model to try it out
 daxops init ./sample/
+```
+
+## PBIP Project Support
+
+DaxOps auto-detects whether you point it at a raw TMDL folder or a full `.pbip` project and handles both transparently. Supported input paths:
+
+| Path Type | Example |
+|-----------|---------|
+| Raw TMDL folder | `./my-model/` (contains `model.tmdl`, `tables/`) |
+| `.pbip` project root | `./MyProject/` (contains `*.pbip`, `*.SemanticModel/`) |
+| `.SemanticModel` folder | `./MyProject/Sales.SemanticModel/` |
+| `definition/` subfolder | `./MyProject/Sales.SemanticModel/definition/` |
+
+```bash
+# All of these work:
+daxops score ./my-tmdl-folder/
+daxops score ./my-pbip-project/
+daxops check ./MyProject/Sales.SemanticModel/
 ```
 
 ## Exit Codes

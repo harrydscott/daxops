@@ -1,0 +1,26 @@
+/// Main sales table
+table Sales
+	lineageTag: pbip-001
+
+	measure 'Total Revenue' = SUM(Sales[Amount])
+		formatString: $#,##0
+		lineageTag: pm-001
+
+	column Amount
+		dataType: decimal
+		formatString: $#,##0.00
+		summarizeBy: sum
+		lineageTag: pc-001
+
+	column 'Order ID'
+		dataType: string
+		lineageTag: pc-002
+
+	partition Sales = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "db"),
+				Sales = Source{[Schema="dbo",Item="Sales"]}[Data]
+			in
+				Sales

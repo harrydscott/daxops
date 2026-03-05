@@ -20,9 +20,63 @@ def _unquote(name: str) -> str:
     return name.strip("'\" ")
 
 
+def resolve_model_root(path: str | Path) -> Path:
+    """Resolve the TMDL model root directory from a path.
+
+    Accepts:
+    - A raw TMDL folder (contains model.tmdl and/or tables/)
+    - A .pbip project root (contains *.pbip file + *.SemanticModel/ folder)
+    - A *.SemanticModel folder directly
+    - A definition/ subfolder within a SemanticModel folder
+
+    Returns the directory containing model.tmdl and tables/.
+    """
+    root = Path(path)
+    if not root.is_dir():
+        raise ValueError(f"Path is not a directory: {root}")
+
+    # Case 1: Direct TMDL folder (has model.tmdl or tables/)
+    if (root / "model.tmdl").exists() or (root / "tables").is_dir():
+        return root
+
+    # Case 2: .pbip project root — look for *.SemanticModel folder
+    pbip_files = list(root.glob("*.pbip"))
+    semantic_dirs = list(root.glob("*.SemanticModel"))
+    if pbip_files or semantic_dirs:
+        for sd in semantic_dirs:
+            if sd.is_dir():
+                # Check definition/ subfolder first (TMDL format)
+                defn = sd / "definition"
+                if defn.is_dir() and ((defn / "model.tmdl").exists() or (defn / "tables").is_dir()):
+                    return defn
+                # Fall back to SemanticModel root
+                if (sd / "model.tmdl").exists() or (sd / "tables").is_dir():
+                    return sd
+        if pbip_files:
+            raise ValueError(
+                f"Found .pbip file but no SemanticModel folder with TMDL content in: {root}"
+            )
+
+    # Case 3: This IS a *.SemanticModel folder
+    if root.name.endswith(".SemanticModel"):
+        defn = root / "definition"
+        if defn.is_dir() and ((defn / "model.tmdl").exists() or (defn / "tables").is_dir()):
+            return defn
+        if (root / "model.tmdl").exists() or (root / "tables").is_dir():
+            return root
+
+    raise ValueError(
+        f"Cannot find TMDL model in: {root}. "
+        "Expected a folder with model.tmdl/tables/, a .pbip project, or a .SemanticModel folder."
+    )
+
+
 def parse_model(model_path: str | Path) -> SemanticModel:
-    """Parse a TMDL model directory and return a SemanticModel."""
-    root = Path(model_path)
+    """Parse a TMDL model directory and return a SemanticModel.
+
+    Accepts a raw TMDL folder, a .pbip project root, or a .SemanticModel folder.
+    """
+    root = resolve_model_root(model_path)
     model = SemanticModel()
 
     # Parse model.tmdl

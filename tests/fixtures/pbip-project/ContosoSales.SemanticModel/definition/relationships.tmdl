@@ -1,0 +1,3 @@
+relationship rel-sales-date
+	fromColumn: Sales.'Order ID'
+	toColumn: DimDate.Date
