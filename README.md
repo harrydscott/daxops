@@ -34,6 +34,10 @@ daxops score ./my-model/
 # Run health checks
 daxops check ./my-model/
 
+# JSON output for CI/CD pipelines
+daxops score ./my-model/ --format json
+daxops check ./my-model/ --format json
+
 # Generate a full HTML report
 daxops report ./my-model/ --format html
 
@@ -45,6 +49,47 @@ daxops document ./my-model/ --provider openai --model gpt-4o
 
 # Create a sample model to try it out
 daxops init ./sample/
+```
+
+## Exit Codes
+
+All commands use consistent exit codes for CI/CD:
+
+| Code | Meaning |
+|------|---------|
+| `0` | Pass — no issues found / thresholds met |
+| `1` | Findings — issues found or thresholds breached |
+| `2` | Runtime error — invalid path, parse error, etc. |
+
+## Configuration
+
+Create a `.daxops.yml` file in your project root to configure thresholds and rules:
+
+```yaml
+# .daxops.yml
+score:
+  bronze_min: 10    # minimum score to pass Bronze tier (default: 10)
+  silver_min: 10    # minimum score to pass Silver tier (default: 10)
+  gold_min: 8       # minimum score to pass Gold tier (default: 8)
+
+check:
+  max_errors: 0     # max errors before exit 1 (default: 0)
+  max_warnings: ~   # max warnings before exit 1 (default: unlimited)
+
+exclude_rules:      # rules to skip
+  - UNUSED_COLUMNS
+  - MISSING_FORMAT
+
+exclude_tables:     # tables to skip in health checks
+  - _Measures
+
+severity: WARNING   # default minimum severity filter
+```
+
+DaxOps automatically discovers `.daxops.yml` by walking up from the model directory. You can also specify it explicitly:
+
+```bash
+daxops --config path/to/.daxops.yml score ./my-model/
 ```
 
 ## Scoring Framework
@@ -74,23 +119,46 @@ DaxOps evaluates your semantic model across three tiers:
 
 ## CI/CD Integration
 
-```bash
-# Exit code 0 = pass, 1 = errors found
-daxops check ./my-model/ --format json --severity ERROR
+### GitHub Actions
 
-# JSON output for automation
-daxops score ./my-model/ --format json
-```
-
-### GitHub Actions Example
+DaxOps ships with a ready-to-use workflow. Copy `.github/workflows/daxops-ci.yml` to your repo, or add these steps to your existing workflow:
 
 ```yaml
-- name: Check semantic model
-  run: |
-    pip install daxops
-    daxops check ./model/ --severity ERROR
-    daxops score ./model/ --format json > score.json
+- name: Install DaxOps
+  run: pip install daxops
+
+- name: Score model
+  run: daxops score ./model/ --format json
+
+- name: Check model
+  run: daxops check ./model/ --format json
 ```
+
+The workflow automatically:
+- Detects your TMDL model directory
+- Runs score and check with JSON output
+- Posts results to the GitHub Actions step summary
+- Uploads JSON artifacts for downstream use
+- Fails the build if thresholds are breached
+
+### Pre-commit Hook
+
+Add DaxOps to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/your-org/daxops
+    rev: v0.2.0
+    hooks:
+      - id: daxops-check
+        args: ['./path/to/model/']
+      - id: daxops-score
+        args: ['./path/to/model/']
+```
+
+Available hooks:
+- `daxops-check` — runs health checks, fails on findings
+- `daxops-score` — scores AI readiness, fails if below Bronze
 
 ## Auto-Documentation
 

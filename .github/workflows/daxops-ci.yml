@@ -1,0 +1,70 @@
+name: DaxOps Model Quality
+
+on:
+  pull_request:
+    paths:
+      - '**/*.tmdl'
+      - '.daxops.yml'
+  push:
+    paths:
+      - '**/*.tmdl'
+      - '.daxops.yml'
+  workflow_dispatch:
+    inputs:
+      model_path:
+        description: 'Path to TMDL model directory'
+        required: false
+        default: '.'
+
+jobs:
+  daxops:
+    name: Score & Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install DaxOps
+        run: pip install daxops
+
+      - name: Determine model path
+        id: model
+        run: |
+          MODEL_PATH="${{ github.event.inputs.model_path || '.' }}"
+          # Auto-detect: look for model.tmdl
+          if [ ! -f "$MODEL_PATH/model.tmdl" ]; then
+            FOUND=$(find . -name "model.tmdl" -not -path "./.git/*" | head -1)
+            if [ -n "$FOUND" ]; then
+              MODEL_PATH=$(dirname "$FOUND")
+            fi
+          fi
+          echo "path=$MODEL_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: DaxOps Score
+        run: |
+          echo "## DaxOps Score" >> "$GITHUB_STEP_SUMMARY"
+          daxops score "${{ steps.model.outputs.path }}" --format json | tee score.json
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat score.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: DaxOps Check
+        run: |
+          echo "## DaxOps Health Check" >> "$GITHUB_STEP_SUMMARY"
+          daxops check "${{ steps.model.outputs.path }}" --format json | tee check.json
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat check.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daxops-results
+          path: |
+            score.json
+            check.json

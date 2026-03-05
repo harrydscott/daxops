@@ -1,0 +1,19 @@
+- id: daxops-check
+  name: DaxOps Health Check
+  description: Run DaxOps health checks on TMDL models
+  entry: daxops check
+  language: python
+  types_or: [file]
+  files: '\.tmdl$'
+  pass_filenames: false
+  additional_dependencies: ['daxops']
+
+- id: daxops-score
+  name: DaxOps Score
+  description: Score TMDL model AI readiness (fails if below Bronze)
+  entry: daxops score
+  language: python
+  types_or: [file]
+  files: '\.tmdl$'
+  pass_filenames: false
+  additional_dependencies: ['daxops']
