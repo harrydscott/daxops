@@ -20,6 +20,7 @@ class Finding:
     severity: Severity
     message: str
     object_path: str = ""
+    recommendation: str = ""
 
 
 def run_health_checks(model: SemanticModel) -> list[Finding]:
@@ -46,6 +47,7 @@ def _naming_convention(model: SemanticModel) -> list[Finding]:
                 severity=Severity.WARNING,
                 message=f"Table '{t.name}' uses a technical prefix — use business-friendly names",
                 object_path=t.name,
+                recommendation=f"Rename table to remove prefix (e.g., '{re.sub(r'^(dim|fact|stg|vw|tbl|dbo)[_.]?', '', t.name, flags=re.IGNORECASE)}') or run 'daxops fix'",
             ))
         for c in t.columns:
             if "_" in c.name:
@@ -54,6 +56,7 @@ def _naming_convention(model: SemanticModel) -> list[Finding]:
                     severity=Severity.INFO,
                     message=f"Column '{c.name}' contains underscores — consider spaces",
                     object_path=f"{t.name}.{c.name}",
+                    recommendation=f"Rename to '{c.name.replace('_', ' ')}' for a friendlier end-user experience",
                 ))
     return findings
 
@@ -68,6 +71,7 @@ def _missing_description(model: SemanticModel) -> list[Finding]:
                     severity=Severity.WARNING,
                     message=f"Measure '{m.name}' has no description",
                     object_path=f"{t.name}.[{m.name}]",
+                    recommendation="Add a /// description above the measure definition, or run 'daxops document' to auto-generate with LLM",
                 ))
     return findings
 
@@ -82,6 +86,7 @@ def _hidden_keys(model: SemanticModel) -> list[Finding]:
                     severity=Severity.WARNING,
                     message=f"Column '{c.name}' looks like a key but isn't hidden",
                     object_path=f"{t.name}.{c.name}",
+                    recommendation="Add 'isHidden' property to this column in the TMDL file, or run 'daxops fix'",
                 ))
     return findings
 
@@ -91,11 +96,17 @@ def _missing_format(model: SemanticModel) -> list[Finding]:
     for t in model.tables:
         for c in t.columns:
             if c.data_type in ("decimal", "double", "currency", "int64") and not c.format_string:
+                fmt_suggestions = {
+                    "decimal": "#,##0.00", "double": "#,##0.00",
+                    "currency": "$#,##0.00", "int64": "#,##0",
+                }
+                suggested = fmt_suggestions.get(c.data_type, "#,##0")
                 findings.append(Finding(
                     rule="MISSING_FORMAT",
                     severity=Severity.INFO,
                     message=f"Column '{c.name}' ({c.data_type}) has no format string",
                     object_path=f"{t.name}.{c.name}",
+                    recommendation=f"Add 'formatString: {suggested}' to the column definition",
                 ))
     return findings
 
@@ -114,6 +125,7 @@ def _unused_columns(model: SemanticModel) -> list[Finding]:
                         severity=Severity.INFO,
                         message=f"Column '{c.name}' is not referenced in any measure in '{t.name}'",
                         object_path=f"{t.name}.{c.name}",
+                        recommendation="Consider hiding this column (isHidden) or removing it if not used in reports",
                     ))
     return findings
 
@@ -131,6 +143,7 @@ def _dax_complexity(model: SemanticModel) -> list[Finding]:
                     severity=Severity.WARNING,
                     message=f"Measure '{m.name}' has complex DAX ({calc_count} CALCULATE, {filter_count} FILTER)",
                     object_path=f"{t.name}.[{m.name}]",
+                    recommendation="Break into smaller helper measures, use variables (VAR/RETURN), or simplify filter logic",
                 ))
     return findings
 
@@ -146,6 +159,7 @@ def _missing_date_table(model: SemanticModel) -> list[Finding]:
             rule="MISSING_DATE_TABLE",
             severity=Severity.WARNING,
             message="No dedicated date table detected",
+            recommendation="Create a dedicated Date table with dateTime column and mark it as a date table for time intelligence",
         )]
     return []
 
@@ -159,6 +173,7 @@ def _bidirectional_relationship(model: SemanticModel) -> list[Finding]:
                 severity=Severity.WARNING,
                 message=f"Relationship '{r.name}' uses bidirectional cross-filtering",
                 object_path=r.name,
+                recommendation="Change to single-direction filtering unless bidirectional is explicitly needed — it can cause ambiguous paths and performance issues",
             ))
     return findings
 
@@ -173,6 +188,7 @@ def _missing_display_folder(model: SemanticModel) -> list[Finding]:
                     severity=Severity.INFO,
                     message=f"Measure '{m.name}' has no display folder",
                     object_path=f"{t.name}.[{m.name}]",
+                    recommendation="Add 'displayFolder: <FolderName>' to organise measures for end users",
                 ))
     return findings
 
@@ -187,5 +203,6 @@ def _column_count(model: SemanticModel) -> list[Finding]:
                 severity=Severity.WARNING,
                 message=f"Table '{t.name}' has {len(visible)} visible columns — consider star schema",
                 object_path=t.name,
+                recommendation="Split into dimension/fact tables using star schema, hide technical columns, or use display folders",
             ))
     return findings

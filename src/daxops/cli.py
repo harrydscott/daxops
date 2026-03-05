@@ -179,7 +179,8 @@ def check(ctx, model_path: str, fmt: str, severity: str | None, use_baseline: bo
     if fmt == "json":
         data = {
             "findings": [
-                {"rule": f.rule, "severity": f.severity.value, "message": f.message, "object": f.object_path}
+                {"rule": f.rule, "severity": f.severity.value, "message": f.message,
+                 "object": f.object_path, "recommendation": f.recommendation}
                 for f in findings
             ],
             "summary": {
@@ -194,25 +195,54 @@ def check(ctx, model_path: str, fmt: str, severity: str | None, use_baseline: bo
     elif fmt == "markdown":
         click.echo(generate_health_report(findings))
     else:
+        # Summary dashboard
+        error_ct = sum(1 for f in findings if f.severity == Severity.ERROR)
+        warn_ct = sum(1 for f in findings if f.severity == Severity.WARNING)
+        info_ct = sum(1 for f in findings if f.severity == Severity.INFO)
+
+        console.print()
+        console.print("[bold]Health Check Summary")
+        console.print("━" * 40)
+        console.print(f"  [red bold]{error_ct}[/red bold] errors  [yellow bold]{warn_ct}[/yellow bold] warnings  [blue bold]{info_ct}[/blue bold] info")
         if suppressed_count:
-            console.print(f"[dim]({suppressed_count} baseline findings suppressed)")
+            console.print(f"  [dim]{suppressed_count} baseline findings suppressed[/dim]")
+        console.print("━" * 40)
+
         if not findings:
-            console.print("[green]No issues found!")
+            console.print("\n[green bold]No issues found!")
         else:
             sev_colors = {"ERROR": "red", "WARNING": "yellow", "INFO": "blue"}
-            table = RichTable(title=f"Health Check — {len(findings)} findings")
+            sev_icons = {"ERROR": "X", "WARNING": "!", "INFO": "i"}
+            table = RichTable(title=f"{len(findings)} Findings")
+            table.add_column("", width=3)
             table.add_column("Severity", style="bold")
             table.add_column("Rule")
             table.add_column("Object", style="dim")
             table.add_column("Message")
             for f in findings:
+                color = sev_colors.get(f.severity.value, "white")
+                icon = sev_icons.get(f.severity.value, " ")
                 table.add_row(
-                    f"[{sev_colors.get(f.severity.value, 'white')}]{f.severity.value}",
+                    f"[{color} bold]{icon}[/{color} bold]",
+                    f"[{color}]{f.severity.value}[/{color}]",
                     f.rule,
                     f.object_path,
                     f.message,
                 )
             console.print(table)
+
+            # Show recommendations for top findings
+            recs = [f for f in findings if f.recommendation]
+            if recs:
+                console.print("\n[bold]Recommendations:")
+                shown = set()
+                for f in recs:
+                    # Deduplicate by rule+recommendation
+                    key = f"{f.rule}:{f.recommendation}"
+                    if key not in shown:
+                        shown.add(key)
+                        color = sev_colors.get(f.severity.value, "white")
+                        console.print(f"  [{color}]{f.rule}[/{color}]: {f.recommendation}")
 
     # Exit code logic: check against config thresholds
     error_count = sum(1 for f in findings if f.severity == Severity.ERROR)
@@ -514,3 +544,219 @@ def baseline(ctx, model_path: str, fmt: str):
     else:
         console.print(f"[green]Baseline saved to {baseline_path}")
         console.print(f"[dim]Suppressed {len(findings)} existing findings.")
+
+
+@cli.command(name="test")
+@click.argument("model_path", type=click.Path(exists=True))
+@click.argument("test_file", type=click.Path(exists=True))
+@click.option("--reference", type=click.Path(exists=True), default=None, help="Reference data file (JSON/YAML) for value comparison")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+def test_cmd(model_path: str, test_file: str, reference: str | None, fmt: str):
+    """Run measure tests against a model."""
+    from daxops.parser.tmdl import parse_model
+    from daxops.testing import (
+        load_test_cases,
+        run_static_tests,
+        run_tests_with_reference,
+        load_reference_data,
+        TestStatus,
+    )
+
+    model = parse_model(model_path)
+    cases = load_test_cases(Path(test_file))
+
+    if reference:
+        ref_data = load_reference_data(Path(reference))
+        results = run_tests_with_reference(model, cases, ref_data)
+    else:
+        results = run_static_tests(model, cases)
+
+    passed = sum(1 for r in results if r.status == TestStatus.PASS)
+    failed = sum(1 for r in results if r.status == TestStatus.FAIL)
+    errors = sum(1 for r in results if r.status == TestStatus.ERROR)
+
+    if fmt == "json":
+        data = {
+            "results": [
+                {
+                    "measure": r.test.measure,
+                    "status": r.status.value,
+                    "expected": r.test.expected,
+                    "actual": r.actual,
+                    "message": r.message,
+                    "description": r.test.description,
+                }
+                for r in results
+            ],
+            "summary": {
+                "total": len(results),
+                "passed": passed,
+                "failed": failed,
+                "errors": errors,
+            },
+        }
+        click.echo(json.dumps(data, indent=2))
+    else:
+        status_icons = {TestStatus.PASS: "[green]PASS", TestStatus.FAIL: "[red]FAIL", TestStatus.ERROR: "[yellow]ERROR"}
+        for r in results:
+            icon = status_icons[r.status]
+            desc = f" — {r.test.description}" if r.test.description else ""
+            console.print(f"  {icon}[/] {r.test.measure}{desc}")
+            if r.message:
+                console.print(f"        [dim]{r.message}[/dim]")
+
+        console.print()
+        console.print(f"  [bold]{len(results)} tests: [green]{passed} passed[/green], [red]{failed} failed[/red], [yellow]{errors} errors[/yellow]")
+
+    if failed > 0 or errors > 0:
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("model_path", type=click.Path(exists=True))
+@click.argument("rules_file", type=click.Path(exists=True))
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+def bpa(model_path: str, rules_file: str, fmt: str):
+    """Run Tabular Editor Best Practice Analyzer rules against a model."""
+    from daxops.parser.tmdl import parse_model
+    from daxops.bpa import load_bpa_rules, run_bpa_checks, get_supported_rule_ids
+
+    model = parse_model(model_path)
+    rules = load_bpa_rules(Path(rules_file))
+    findings, unmapped = run_bpa_checks(model, rules)
+
+    if fmt == "json":
+        data = {
+            "findings": [
+                {"rule": f.rule, "severity": f.severity.value, "message": f.message, "object": f.object_path}
+                for f in findings
+            ],
+            "summary": {
+                "total": len(findings),
+                "rules_loaded": len(rules),
+                "rules_mapped": len(rules) - len(unmapped),
+                "rules_unmapped": len(unmapped),
+            },
+            "unmapped_rules": [
+                {"id": r.id, "name": r.name, "category": r.category}
+                for r in unmapped
+            ],
+            "supported_rules": get_supported_rule_ids(),
+        }
+        click.echo(json.dumps(data, indent=2))
+    else:
+        console.print(f"[bold]Loaded {len(rules)} BPA rules ({len(rules) - len(unmapped)} mapped, {len(unmapped)} unmapped)\n")
+
+        if findings:
+            sev_colors = {"ERROR": "red", "WARNING": "yellow", "INFO": "blue"}
+            from rich.table import Table as RichTable
+            table = RichTable(title=f"BPA Findings — {len(findings)} issues")
+            table.add_column("Severity", style="bold")
+            table.add_column("Rule")
+            table.add_column("Object", style="dim")
+            table.add_column("Message")
+            for f in findings:
+                table.add_row(
+                    f"[{sev_colors.get(f.severity.value, 'white')}]{f.severity.value}",
+                    f.rule,
+                    f.object_path,
+                    f.message,
+                )
+            console.print(table)
+        else:
+            console.print("[green]No BPA findings!")
+
+        if unmapped:
+            console.print(f"\n[dim]{len(unmapped)} rules could not be evaluated (require Dynamic LINQ):[/dim]")
+            for r in unmapped[:5]:
+                console.print(f"  [dim]- {r.id}: {r.name}[/dim]")
+            if len(unmapped) > 5:
+                console.print(f"  [dim]... and {len(unmapped) - 5} more[/dim]")
+
+    if findings:
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("model_path", type=click.Path(exists=True))
+@click.option("--output", "-o", type=click.Path(), default=None, help="Output SVG file path")
+@click.option("--style", type=click.Choice(["tier", "score"]), default="tier", help="Badge style")
+@click.option("--format", "fmt", type=click.Choice(["svg", "json"]), default="svg")
+@click.pass_context
+def badge(ctx, model_path: str, output: str | None, style: str, fmt: str):
+    """Generate an SVG badge showing model tier status."""
+    from daxops.parser.tmdl import parse_model
+    from daxops.scoring import score_bronze, score_silver, score_gold
+    from daxops.badge import determine_tier, generate_tier_badge, generate_score_badge
+
+    config = _get_config(ctx, model_path)
+    model = parse_model(model_path)
+    b = sum(c.score for c in score_bronze(model))
+    s = sum(c.score for c in score_silver(model))
+    g = sum(c.score for c in score_gold(model))
+    tier = determine_tier(b, s, g, config)
+
+    if fmt == "json":
+        data = {"tier": tier, "bronze": b, "silver": s, "gold": g}
+        click.echo(json.dumps(data, indent=2))
+        return
+
+    if style == "score":
+        svg = generate_score_badge(tier, b, s, g)
+    else:
+        svg = generate_tier_badge(tier)
+
+    if output:
+        Path(output).write_text(svg, encoding="utf-8")
+        console.print(f"[green]Badge written to {output}")
+    else:
+        click.echo(svg)
+
+
+@cli.command()
+@click.argument("before_path", type=click.Path(exists=True))
+@click.argument("after_path", type=click.Path(exists=True))
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+def compare(before_path: str, after_path: str, fmt: str):
+    """Compare two model versions — show improvement over time."""
+    from daxops.parser.tmdl import parse_model
+    from daxops.compare import compare_models, comparison_to_dict
+
+    before = parse_model(before_path)
+    after = parse_model(after_path)
+    result = compare_models(before, after)
+
+    if fmt == "json":
+        click.echo(json.dumps(comparison_to_dict(result), indent=2))
+    else:
+        def _arrow(delta: int) -> str:
+            if delta > 0:
+                return f"[green]+{delta}[/green]"
+            elif delta < 0:
+                return f"[red]{delta}[/red]"
+            return "[dim]0[/dim]"
+
+        console.print("[bold]Model Comparison\n")
+        console.print(f"  {'':20s} {'Before':>8s}  {'After':>8s}  {'Delta':>8s}")
+        console.print(f"  {'Bronze Score':20s} {result.before.bronze:>8d}  {result.after.bronze:>8d}  {_arrow(result.bronze_delta)}")
+        console.print(f"  {'Silver Score':20s} {result.before.silver:>8d}  {result.after.silver:>8d}  {_arrow(result.silver_delta)}")
+        console.print(f"  {'Gold Score':20s} {result.before.gold:>8d}  {result.after.gold:>8d}  {_arrow(result.gold_delta)}")
+        console.print(f"  {'Findings':20s} {result.before.findings_total:>8d}  {result.after.findings_total:>8d}  {_arrow(-result.findings_delta)}")
+
+        if result.resolved_findings:
+            console.print(f"\n  [green]Resolved ({len(result.resolved_findings)}):")
+            for f in result.resolved_findings[:10]:
+                console.print(f"    [green]- {f}")
+
+        if result.new_findings:
+            console.print(f"\n  [red]New ({len(result.new_findings)}):")
+            for f in result.new_findings[:10]:
+                console.print(f"    [red]+ {f}")
+
+        console.print()
+        if result.improved:
+            console.print("[bold green]Model improved!")
+        elif result.findings_delta == 0 and result.bronze_delta == 0:
+            console.print("[dim]No change.")
+        else:
+            console.print("[bold red]Model regressed.")
