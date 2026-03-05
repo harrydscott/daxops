@@ -1,0 +1,31 @@
+/// Store dimension table
+table DimStore
+	lineageTag: ds-0001
+
+	column StoreKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: dsc-001
+
+	column 'Store Name'
+		dataType: string
+		lineageTag: dsc-002
+
+	column 'Store Type'
+		dataType: string
+		lineageTag: dsc-003
+
+	column 'Open Date'
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: dsc-004
+
+	partition DimStore = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "contoso"),
+				DimStore = Source{[Schema="dbo",Item="DimStore"]}[Data]
+			in
+				DimStore

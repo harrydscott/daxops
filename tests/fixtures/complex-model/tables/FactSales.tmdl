@@ -1,0 +1,123 @@
+/// Fact table containing all sales transactions
+table FactSales
+	lineageTag: fs-0001
+
+	column SalesKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: fsc-001
+
+	column DateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: fsc-002
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: fsc-003
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: fsc-004
+
+	column StoreKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: fsc-005
+
+	column Quantity
+		dataType: int64
+		formatString: #,##0
+		summarizeBy: sum
+		lineageTag: fsc-006
+
+	column 'Unit Price'
+		dataType: decimal
+		formatString: $#,##0.00
+		summarizeBy: none
+		lineageTag: fsc-007
+
+	column 'Net Amount'
+		dataType: decimal
+		formatString: $#,##0.00
+		summarizeBy: sum
+		lineageTag: fsc-008
+
+	column 'Discount Amount'
+		dataType: decimal
+		formatString: $#,##0.00
+		summarizeBy: sum
+		lineageTag: fsc-009
+
+	/// Calculated column: gross amount before discount
+	column 'Gross Amount' = FactSales[Net Amount] + FactSales[Discount Amount]
+		dataType: decimal
+		formatString: $#,##0.00
+		lineageTag: fsc-010
+
+	/// Total sales revenue
+	measure 'Total Sales' = SUM(FactSales[Net Amount])
+		formatString: $#,##0
+		displayFolder: Revenue
+		lineageTag: fsm-001
+
+	/// Total quantity sold
+	measure 'Total Quantity' = SUM(FactSales[Quantity])
+		formatString: #,##0
+		displayFolder: Volume
+		lineageTag: fsm-002
+
+	/// Gross margin percentage
+	measure 'Gross Margin %' =
+		VAR _Revenue = [Total Sales]
+		VAR _Cost = SUMX(FactSales, FactSales[Quantity] * RELATED('Dim Product'[Unit Cost]))
+		RETURN DIVIDE(_Revenue - _Cost, _Revenue, 0)
+		formatString: 0.00%
+		displayFolder: Profitability
+		lineageTag: fsm-003
+
+	/// Year-to-date total sales
+	measure 'YTD Sales' = TOTALYTD([Total Sales], DimDate[Date])
+		formatString: $#,##0
+		displayFolder: Revenue
+		lineageTag: fsm-004
+
+	/// Same period last year sales
+	measure 'PY Sales' = CALCULATE([Total Sales], SAMEPERIODLASTYEAR(DimDate[Date]))
+		formatString: $#,##0
+		displayFolder: Revenue
+		lineageTag: fsm-005
+
+	/// Year-over-year growth rate
+	measure 'YoY Growth %' = DIVIDE([Total Sales] - [PY Sales], [PY Sales], 0)
+		formatString: 0.00%
+		displayFolder: Revenue
+		lineageTag: fsm-006
+
+	/// Average order value
+	measure 'Avg Order Value' = DIVIDE([Total Sales], DISTINCTCOUNT(FactSales[SalesKey]), 0)
+		formatString: $#,##0.00
+		displayFolder: Revenue
+		lineageTag: fsm-007
+
+	/// Total discount given
+	measure 'Total Discount' = SUM(FactSales[Discount Amount])
+		formatString: $#,##0
+		displayFolder: Profitability
+		lineageTag: fsm-008
+
+	partition FactSales = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "contoso"),
+				FactSales = Source{[Schema="dbo",Item="FactSales"]}[Data]
+			in
+				FactSales

@@ -1,0 +1,75 @@
+/// Product dimension table with full hierarchy support
+table 'Dim Product'
+	lineageTag: prod-0001
+
+	column ProductKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: pc-001
+
+	column 'Product Name'
+		dataType: string
+		lineageTag: pc-002
+
+	column Category
+		dataType: string
+		lineageTag: pc-003
+
+	column Subcategory
+		dataType: string
+		lineageTag: pc-004
+
+	column Brand
+		dataType: string
+		displayFolder: Attributes
+		lineageTag: pc-005
+
+	/// Unit cost used to compute margin
+	column 'Unit Cost'
+		dataType: decimal
+		formatString: $#,##0.00
+		summarizeBy: none
+		lineageTag: pc-006
+
+	/// Unit price for the product
+	column 'Unit Price'
+		dataType: decimal
+		formatString: $#,##0.00
+		summarizeBy: none
+		lineageTag: pc-007
+
+	/// Calculated column: margin percentage per product
+	column 'Margin %' = DIVIDE([Unit Price] - [Unit Cost], [Unit Price], 0)
+		dataType: decimal
+		formatString: 0.00%
+		lineageTag: pc-008
+
+	hierarchy 'Product Hierarchy'
+		lineageTag: h-001
+
+		level Category
+			column: Category
+			lineageTag: hl-001
+
+		level Subcategory
+			column: Subcategory
+			lineageTag: hl-002
+
+		level 'Product Name'
+			column: 'Product Name'
+			lineageTag: hl-003
+
+	/// Total product count
+	measure 'Product Count' = COUNTROWS('Dim Product')
+		formatString: #,##0
+		lineageTag: pm-001
+
+	partition 'Dim Product' = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "contoso"),
+				DimProduct = Source{[Schema="dbo",Item="DimProduct"]}[Data]
+			in
+				DimProduct

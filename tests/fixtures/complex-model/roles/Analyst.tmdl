@@ -1,0 +1,6 @@
+/// Analysts can only see their assigned country
+role Analyst
+	modelPermission: read
+
+	tablePermission 'Dim Customer' =
+		[Country] = USERPRINCIPALNAME()

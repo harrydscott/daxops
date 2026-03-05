@@ -1,0 +1,21 @@
+relationship rel-fs-date
+	fromColumn: FactSales.DateKey
+	toColumn: DimDate.DateKey
+
+relationship rel-fs-product
+	fromColumn: FactSales.ProductKey
+	toColumn: 'Dim Product'.ProductKey
+
+relationship rel-fs-customer
+	fromColumn: FactSales.CustomerKey
+	toColumn: 'Dim Customer'.CustomerKey
+
+relationship rel-fs-store
+	fromColumn: FactSales.StoreKey
+	toColumn: DimStore.StoreKey
+	crossFilteringBehavior: bothDirections
+
+relationship rel-inactive-order-date
+	fromColumn: FactSales.SalesKey
+	toColumn: DimDate.DateKey
+	isActive: false

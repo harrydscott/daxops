@@ -1,0 +1,3 @@
+model 'Contoso Analytics'
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3

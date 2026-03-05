@@ -1,0 +1,3 @@
+/// Managers see all data — no filters
+role Manager
+	modelPermission: readRefresh

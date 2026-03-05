@@ -1,0 +1,66 @@
+/// Customer dimension with geography hierarchy
+table 'Dim Customer'
+	lineageTag: dc-0001
+
+	column CustomerKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: dcc-001
+
+	column 'Customer Name'
+		dataType: string
+		lineageTag: dcc-002
+
+	column Email
+		dataType: string
+		isHidden
+		lineageTag: dcc-003
+
+	column City
+		dataType: string
+		displayFolder: Geography
+		lineageTag: dcc-004
+
+	column State
+		dataType: string
+		displayFolder: Geography
+		lineageTag: dcc-005
+
+	column Country
+		dataType: string
+		displayFolder: Geography
+		lineageTag: dcc-006
+
+	column Segment
+		dataType: string
+		lineageTag: dcc-007
+
+	hierarchy 'Geography'
+		lineageTag: h-003
+
+		level Country
+			column: Country
+			lineageTag: hl-020
+
+		level State
+			column: State
+			lineageTag: hl-021
+
+		level City
+			column: City
+			lineageTag: hl-022
+
+	/// Distinct customer count
+	measure 'Customer Count' = DISTINCTCOUNT(FactSales[CustomerKey])
+		formatString: #,##0
+		lineageTag: dcm-001
+
+	partition 'Dim Customer' = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "contoso"),
+				DimCustomer = Source{[Schema="dbo",Item="DimCustomer"]}[Data]
+			in
+				DimCustomer

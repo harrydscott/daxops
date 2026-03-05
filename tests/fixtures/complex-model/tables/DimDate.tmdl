@@ -1,0 +1,66 @@
+/// Standard date dimension table
+table DimDate
+	lineageTag: dd-0001
+
+	column DateKey
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		lineageTag: ddc-001
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		lineageTag: ddc-002
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		lineageTag: ddc-003
+
+	column Quarter
+		dataType: string
+		lineageTag: ddc-004
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: ddc-005
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		lineageTag: ddc-006
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: ddc-007
+
+	column 'Is Weekend' = IF(WEEKDAY(DimDate[Date], 2) > 5, TRUE(), FALSE())
+		dataType: boolean
+		lineageTag: ddc-008
+
+	hierarchy 'Calendar Hierarchy'
+		lineageTag: h-002
+
+		level Year
+			column: Year
+			lineageTag: hl-010
+
+		level Quarter
+			column: Quarter
+			lineageTag: hl-011
+
+		level 'Month Name'
+			column: 'Month Name'
+			lineageTag: hl-012
+
+	partition DimDate = m
+		mode: import
+		source =
+			let
+				Source = Sql.Database("server", "contoso"),
+				DimDate = Source{[Schema="dbo",Item="DimDate"]}[Data]
+			in
+				DimDate

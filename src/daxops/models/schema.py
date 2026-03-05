@@ -13,6 +13,7 @@ class Column(BaseModel):
     lineage_tag: str = ""
     description: str = ""
     display_folder: str = ""
+    expression: str = ""  # Non-empty for calculated columns
 
 
 class Measure(BaseModel):
