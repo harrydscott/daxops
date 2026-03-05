@@ -137,12 +137,14 @@ def _render_score_terminal(bronze, silver, gold, config=None):
 @click.argument("model_path", type=click.Path(exists=True))
 @click.option("--format", "fmt", type=click.Choice(["terminal", "json", "markdown"]), default="terminal")
 @click.option("--severity", type=click.Choice(["ERROR", "WARNING", "INFO"]), default=None, help="Minimum severity to show")
+@click.option("--baseline/--no-baseline", "use_baseline", default=True, help="Apply baseline suppression if available")
 @click.pass_context
-def check(ctx, model_path: str, fmt: str, severity: str | None):
+def check(ctx, model_path: str, fmt: str, severity: str | None, use_baseline: bool):
     """Run health checks on a TMDL model."""
     from daxops.parser.tmdl import parse_model
     from daxops.health.rules import run_health_checks, Severity
     from daxops.report.markdown import generate_health_report
+    from daxops.baseline import load_baseline, filter_new_findings
 
     config = _get_config(ctx, model_path)
     model = parse_model(model_path)
@@ -157,6 +159,15 @@ def check(ctx, model_path: str, fmt: str, severity: str | None):
         findings = [f for f in findings if not any(
             f.object_path.startswith(t) for t in config.exclude_tables
         )]
+
+    # Apply baseline suppression
+    suppressed_count = 0
+    if use_baseline:
+        baseline_keys = load_baseline(model_path)
+        if baseline_keys:
+            all_count = len(findings)
+            findings = filter_new_findings(findings, baseline_keys)
+            suppressed_count = all_count - len(findings)
 
     # Use severity from flag or config
     effective_severity = severity or config.severity
@@ -176,14 +187,17 @@ def check(ctx, model_path: str, fmt: str, severity: str | None):
                 "errors": sum(1 for f in findings if f.severity == Severity.ERROR),
                 "warnings": sum(1 for f in findings if f.severity == Severity.WARNING),
                 "info": sum(1 for f in findings if f.severity == Severity.INFO),
+                "suppressed": suppressed_count,
             },
         }
         click.echo(json.dumps(data, indent=2))
     elif fmt == "markdown":
         click.echo(generate_health_report(findings))
     else:
+        if suppressed_count:
+            console.print(f"[dim]({suppressed_count} baseline findings suppressed)")
         if not findings:
-            console.print("[green]✅ No issues found!")
+            console.print("[green]No issues found!")
         else:
             sev_colors = {"ERROR": "red", "WARNING": "yellow", "INFO": "blue"}
             table = RichTable(title=f"Health Check — {len(findings)} findings")
@@ -412,3 +426,91 @@ def init(output_path: str):
         sys.exit(1)
     shutil.copytree(sample_dir, out)
     console.print(f"[green]Sample model created at {out}")
+
+
+@cli.command()
+@click.argument("model_path", type=click.Path(exists=True))
+@click.option("--interval", type=float, default=1.0, help="Polling interval in seconds")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+@click.pass_context
+def watch(ctx, model_path: str, interval: float, fmt: str):
+    """Watch a model directory and re-run score+check on file changes."""
+    from daxops.watch import watch_model
+
+    config = _get_config(ctx, model_path)
+    watch_model(model_path, interval=interval, fmt=fmt, config=config)
+
+
+@cli.command()
+@click.argument("model_path", type=click.Path(exists=True))
+@click.option("--dry-run", is_flag=True, help="Show what would be fixed without making changes")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+def fix(model_path: str, dry_run: bool, fmt: str):
+    """Auto-fix common issues (rename dim/fact prefixes, hide keys)."""
+    from daxops.fix import run_fixes
+
+    results = run_fixes(model_path, dry_run=dry_run)
+
+    if fmt == "json":
+        data = {
+            "dry_run": dry_run,
+            "fixes": [
+                {"rule": r.rule, "file": r.file_path, "description": r.description, "applied": r.applied}
+                for r in results
+            ],
+            "total": len(results),
+        }
+        click.echo(json.dumps(data, indent=2))
+    else:
+        if not results:
+            console.print("[green]No fixes needed — model looks good!")
+            return
+
+        action = "Would apply" if dry_run else "Applied"
+        console.print(f"\n[bold]{action} {len(results)} fix(es):\n")
+        for r in results:
+            icon = "~" if r.applied else " "
+            console.print(f"  [{icon}] [bold]{r.rule}[/bold] — {r.description}")
+            console.print(f"      [dim]{r.file_path}[/dim]")
+
+        if dry_run:
+            console.print("\n[yellow]Dry run — no changes written. Remove --dry-run to apply.")
+
+
+@cli.command()
+@click.argument("model_path", type=click.Path(exists=True))
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+@click.pass_context
+def baseline(ctx, model_path: str, fmt: str):
+    """Save current findings as a baseline — future runs only show new issues."""
+    from daxops.parser.tmdl import parse_model
+    from daxops.health.rules import run_health_checks, Severity
+    from daxops.baseline import save_baseline
+
+    config = _get_config(ctx, model_path)
+    model = parse_model(model_path)
+    findings = run_health_checks(model)
+
+    # Apply config excludes
+    if config.exclude_rules:
+        findings = [f for f in findings if f.rule not in config.exclude_rules]
+    if config.exclude_tables:
+        findings = [f for f in findings if not any(
+            f.object_path.startswith(t) for t in config.exclude_tables
+        )]
+
+    baseline_path = save_baseline(findings, model_path)
+
+    if fmt == "json":
+        data = {
+            "baseline_file": str(baseline_path),
+            "suppressed_count": len(findings),
+            "findings": [
+                {"rule": f.rule, "severity": f.severity.value, "object": f.object_path}
+                for f in findings
+            ],
+        }
+        click.echo(json.dumps(data, indent=2))
+    else:
+        console.print(f"[green]Baseline saved to {baseline_path}")
+        console.print(f"[dim]Suppressed {len(findings)} existing findings.")

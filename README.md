@@ -48,6 +48,17 @@ daxops diff ./model-v1/ ./model-v2/
 # Auto-generate descriptions with LLM
 daxops document ./my-model/ --provider openai --model gpt-4o
 
+# Watch for changes and re-run score+check
+daxops watch ./my-model/
+
+# Auto-fix common issues (rename dim/fact prefixes, hide keys)
+daxops fix ./my-model/ --dry-run   # preview changes
+daxops fix ./my-model/              # apply changes
+
+# Save current findings as baseline — future checks only show new issues
+daxops baseline ./my-model/
+daxops check ./my-model/            # only new findings shown
+
 # Create a sample model to try it out
 daxops init ./sample/
 ```
@@ -135,6 +146,48 @@ DaxOps evaluates your semantic model across three tiers:
 | `BIDIRECTIONAL_RELATIONSHIP` | WARNING | Bidirectional cross-filtering |
 | `MISSING_DISPLAY_FOLDER` | INFO | Measures without display folders |
 | `COLUMN_COUNT` | WARNING | Tables with >30 visible columns |
+
+## Watch Mode
+
+Re-runs score and health checks whenever TMDL files change:
+
+```bash
+daxops watch ./my-model/
+daxops watch ./my-model/ --interval 2.0   # custom polling interval
+```
+
+Uses polling (no extra dependencies). Press Ctrl+C to stop.
+
+## Auto-Fix
+
+Automatically applies safe fixes to your model:
+
+```bash
+daxops fix ./my-model/ --dry-run   # preview what would change
+daxops fix ./my-model/              # apply fixes
+daxops fix ./my-model/ --format json
+```
+
+Current auto-fixes:
+- **NAMING_CONVENTION** — removes dim/fact/stg/vw/tbl/dbo prefixes from table names
+- **HIDDEN_KEYS** — adds `isHidden` to columns ending in ID, Key, or SK
+
+## Baseline/Suppress
+
+Save current findings as a baseline so future runs only show new issues:
+
+```bash
+# Save current state
+daxops baseline ./my-model/
+
+# Future checks only show NEW findings
+daxops check ./my-model/
+
+# Skip baseline filtering
+daxops check ./my-model/ --no-baseline
+```
+
+The baseline is stored in `.daxops-baseline.json` inside the model directory.
 
 ## CI/CD Integration
 
