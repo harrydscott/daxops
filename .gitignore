@@ -13,3 +13,9 @@ venv/
 !src/**/*.html
 .coverage
 htmlcov/
+
+# Internal project files (keep out of public repo)
+SPEC.md
+PROJECT.md
+NOTES.md
+TODO.md
