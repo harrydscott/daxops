@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.table import Table as RichTable
 
 from daxops import __version__
+from daxops.config import DaxOpsConfig, load_config
 
 console = Console()
 
@@ -27,19 +28,36 @@ class DaxOpsGroup(click.Group):
 
 @click.group(cls=DaxOpsGroup)
 @click.version_option(__version__)
-def cli():
+@click.option("--config", "config_path", type=click.Path(exists=True), default=None, help="Path to .daxops.yml config file")
+@click.pass_context
+def cli(ctx, config_path: str | None):
     """DaxOps — Semantic Model Lifecycle Tool for Power BI / Microsoft Fabric."""
+    ctx.ensure_object(dict)
+    if config_path:
+        ctx.obj["config"] = load_config(Path(config_path))
+    else:
+        ctx.obj["config"] = None  # lazy-load per command using model_path
+
+
+def _get_config(ctx: click.Context, model_path: str | None = None) -> DaxOpsConfig:
+    """Get config from context or load from model path."""
+    if ctx.obj.get("config"):
+        return ctx.obj["config"]
+    start = Path(model_path) if model_path else None
+    return load_config(start)
 
 
 @cli.command()
 @click.argument("model_path", type=click.Path(exists=True))
 @click.option("--format", "fmt", type=click.Choice(["terminal", "json", "markdown"]), default="terminal")
-def score(model_path: str, fmt: str):
+@click.pass_context
+def score(ctx, model_path: str, fmt: str):
     """Score a model's AI readiness (Bronze/Silver/Gold)."""
     from daxops.parser.tmdl import parse_model
     from daxops.scoring import score_bronze, score_silver, score_gold
     from daxops.report.markdown import generate_score_report
 
+    config = _get_config(ctx, model_path)
     model = parse_model(model_path)
     bronze = score_bronze(model)
     silver = score_silver(model)
@@ -48,10 +66,19 @@ def score(model_path: str, fmt: str):
     b = sum(c.score for c in bronze)
     s = sum(c.score for c in silver)
     g = sum(c.score for c in gold)
+
+    bronze_pass = b >= config.score.bronze_min
+    silver_pass = bronze_pass and s >= config.score.silver_min
+    gold_pass = silver_pass and g >= config.score.gold_min
+
     summary = {
         "bronze_score": b, "silver_score": s, "gold_score": g,
-        "bronze_pass": b >= 10, "silver_pass": b >= 10 and s >= 10,
-        "gold_pass": b >= 10 and s >= 10 and g >= 8,
+        "bronze_pass": bronze_pass, "silver_pass": silver_pass, "gold_pass": gold_pass,
+        "thresholds": {
+            "bronze_min": config.score.bronze_min,
+            "silver_min": config.score.silver_min,
+            "gold_min": config.score.gold_min,
+        },
     }
 
     if fmt == "json":
@@ -65,13 +92,14 @@ def score(model_path: str, fmt: str):
     elif fmt == "markdown":
         click.echo(generate_score_report(bronze, silver, gold))
     else:
-        _render_score_terminal(bronze, silver, gold)
+        _render_score_terminal(bronze, silver, gold, config)
 
-    if not summary["bronze_pass"]:
+    # Exit 1 if bronze threshold not met (findings)
+    if not bronze_pass:
         sys.exit(1)
 
 
-def _render_score_terminal(bronze, silver, gold):
+def _render_score_terminal(bronze, silver, gold, config=None):
     for tier_name, criteria, color in [("Bronze", bronze, "yellow"), ("Silver", silver, "white"), ("Gold", gold, "bright_yellow")]:
         total = sum(c.score for c in criteria)
         max_total = sum(c.max_score for c in criteria)
@@ -88,37 +116,68 @@ def _render_score_terminal(bronze, silver, gold):
     b = sum(c.score for c in bronze)
     s = sum(c.score for c in silver)
     g = sum(c.score for c in gold)
+
+    if config:
+        b_min, s_min, g_min = config.score.bronze_min, config.score.silver_min, config.score.gold_min
+    else:
+        b_min, s_min, g_min = 10, 10, 8
+
     console.print()
-    if b >= 10 and s >= 10 and g >= 8:
+    if b >= b_min and s >= s_min and g >= g_min:
         console.print("[bold bright_yellow]🥇 Gold tier achieved!")
-    elif b >= 10 and s >= 10:
+    elif b >= b_min and s >= s_min:
         console.print("[bold white]🥈 Silver tier achieved!")
-    elif b >= 10:
+    elif b >= b_min:
         console.print("[bold yellow]🥉 Bronze tier achieved!")
     else:
-        console.print(f"[dim]⬜ No tier achieved (Bronze needs {10 - b} more points)[/dim]")
+        console.print(f"[dim]⬜ No tier achieved (Bronze needs {b_min - b} more points)[/dim]")
 
 
 @cli.command()
 @click.argument("model_path", type=click.Path(exists=True))
 @click.option("--format", "fmt", type=click.Choice(["terminal", "json", "markdown"]), default="terminal")
 @click.option("--severity", type=click.Choice(["ERROR", "WARNING", "INFO"]), default=None, help="Minimum severity to show")
-def check(model_path: str, fmt: str, severity: str | None):
+@click.pass_context
+def check(ctx, model_path: str, fmt: str, severity: str | None):
     """Run health checks on a TMDL model."""
     from daxops.parser.tmdl import parse_model
     from daxops.health.rules import run_health_checks, Severity
     from daxops.report.markdown import generate_health_report
 
+    config = _get_config(ctx, model_path)
     model = parse_model(model_path)
     findings = run_health_checks(model)
 
-    if severity:
+    # Apply config exclude_rules
+    if config.exclude_rules:
+        findings = [f for f in findings if f.rule not in config.exclude_rules]
+
+    # Apply config exclude_tables
+    if config.exclude_tables:
+        findings = [f for f in findings if not any(
+            f.object_path.startswith(t) for t in config.exclude_tables
+        )]
+
+    # Use severity from flag or config
+    effective_severity = severity or config.severity
+    if effective_severity:
         sev_order = {"ERROR": 0, "WARNING": 1, "INFO": 2}
-        threshold = sev_order[severity]
+        threshold = sev_order[effective_severity]
         findings = [f for f in findings if sev_order[f.severity.value] <= threshold]
 
     if fmt == "json":
-        data = [{"rule": f.rule, "severity": f.severity.value, "message": f.message, "object": f.object_path} for f in findings]
+        data = {
+            "findings": [
+                {"rule": f.rule, "severity": f.severity.value, "message": f.message, "object": f.object_path}
+                for f in findings
+            ],
+            "summary": {
+                "total": len(findings),
+                "errors": sum(1 for f in findings if f.severity == Severity.ERROR),
+                "warnings": sum(1 for f in findings if f.severity == Severity.WARNING),
+                "info": sum(1 for f in findings if f.severity == Severity.INFO),
+            },
+        }
         click.echo(json.dumps(data, indent=2))
     elif fmt == "markdown":
         click.echo(generate_health_report(findings))
@@ -141,8 +200,15 @@ def check(model_path: str, fmt: str, severity: str | None):
                 )
             console.print(table)
 
-    # Exit code: 1 if any findings (warnings or errors)
-    if findings:
+    # Exit code logic: check against config thresholds
+    error_count = sum(1 for f in findings if f.severity == Severity.ERROR)
+    warning_count = sum(1 for f in findings if f.severity == Severity.WARNING)
+
+    if config.check.max_errors is not None and error_count > config.check.max_errors:
+        sys.exit(1)
+    elif config.check.max_warnings is not None and warning_count > config.check.max_warnings:
+        sys.exit(1)
+    elif findings:
         sys.exit(1)
 
 
@@ -159,14 +225,20 @@ def diff(old_path: str, new_path: str, fmt: str):
     new = parse_model(new_path)
     result = diff_models(old, new)
 
-    if not result.has_changes:
-        console.print("[green]No changes detected.")
-        return
-
     if fmt == "json":
-        data = [{"category": c.category, "type": c.change_type, "path": c.path, "details": c.details} for c in result.changes]
+        data = {
+            "has_changes": result.has_changes,
+            "changes": [
+                {"category": c.category, "type": c.change_type, "path": c.path, "details": c.details}
+                for c in result.changes
+            ],
+        }
         click.echo(json.dumps(data, indent=2))
     else:
+        if not result.has_changes:
+            console.print("[green]No changes detected.")
+            return
+
         type_colors = {"added": "green", "removed": "red", "modified": "yellow"}
         type_icons = {"added": "+", "removed": "-", "modified": "~"}
         for c in result.changes:
@@ -175,24 +247,65 @@ def diff(old_path: str, new_path: str, fmt: str):
             detail = f" ({c.details})" if c.details else ""
             console.print(f"  [{color}]{icon} [{c.category}] {c.path}{detail}")
 
+    # Exit 0 for no changes, 1 for changes (useful in CI)
+    if result.has_changes:
+        sys.exit(1)
+
 
 @cli.command()
 @click.argument("model_path", type=click.Path(exists=True))
-@click.option("--format", "fmt", type=click.Choice(["html", "markdown"]), default="html")
+@click.option("--format", "fmt", type=click.Choice(["html", "markdown", "json"]), default="html")
 @click.option("--output", "-o", type=click.Path(), default=None, help="Output file path")
-def report(model_path: str, fmt: str, output: str | None):
+@click.pass_context
+def report(ctx, model_path: str, fmt: str, output: str | None):
     """Generate a full report (score + health checks)."""
     from daxops.parser.tmdl import parse_model
     from daxops.scoring import score_bronze, score_silver, score_gold
-    from daxops.health.rules import run_health_checks
+    from daxops.health.rules import run_health_checks, Severity
     from daxops.report.markdown import generate_score_report, generate_health_report
     from daxops.report.html import generate_html_report
 
+    config = _get_config(ctx, model_path)
     model = parse_model(model_path)
     bronze = score_bronze(model)
     silver = score_silver(model)
     gold = score_gold(model)
     findings = run_health_checks(model)
+
+    if fmt == "json":
+        b = sum(c.score for c in bronze)
+        s = sum(c.score for c in silver)
+        g = sum(c.score for c in gold)
+        data = {
+            "scoring": {
+                tier: [{"name": c.name, "score": c.score, "max": c.max_score, "details": c.details}
+                       for c in criteria]
+                for tier, criteria in [("bronze", bronze), ("silver", silver), ("gold", gold)]
+            },
+            "summary": {
+                "bronze_score": b, "silver_score": s, "gold_score": g,
+                "bronze_pass": b >= config.score.bronze_min,
+                "silver_pass": b >= config.score.bronze_min and s >= config.score.silver_min,
+                "gold_pass": b >= config.score.bronze_min and s >= config.score.silver_min and g >= config.score.gold_min,
+            },
+            "health": {
+                "findings": [
+                    {"rule": f.rule, "severity": f.severity.value, "message": f.message, "object": f.object_path}
+                    for f in findings
+                ],
+                "total": len(findings),
+                "errors": sum(1 for f in findings if f.severity == Severity.ERROR),
+                "warnings": sum(1 for f in findings if f.severity == Severity.WARNING),
+                "info": sum(1 for f in findings if f.severity == Severity.INFO),
+            },
+        }
+        content = json.dumps(data, indent=2)
+        if output:
+            Path(output).write_text(content, encoding="utf-8")
+            console.print(f"[green]Report written to {output}")
+        else:
+            click.echo(content)
+        return
 
     if fmt == "html":
         content = generate_html_report(bronze, silver, gold, findings)
@@ -212,11 +325,12 @@ def report(model_path: str, fmt: str, output: str | None):
 
 @cli.command()
 @click.argument("model_path", type=click.Path(exists=True))
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
 @click.option("--provider", type=click.Choice(["openai"]), default="openai")
 @click.option("--model", "llm_model", default="gpt-4o")
 @click.option("--api-key", envvar="OPENAI_API_KEY", default=None)
 @click.option("--dry-run", is_flag=True, help="Show what would be documented without calling LLM")
-def document(model_path: str, provider: str, llm_model: str, api_key: str | None, dry_run: bool):
+def document(model_path: str, fmt: str, provider: str, llm_model: str, api_key: str | None, dry_run: bool):
     """Auto-generate descriptions for undocumented objects using LLM."""
     from daxops.parser.tmdl import parse_model
 
@@ -226,21 +340,29 @@ def document(model_path: str, provider: str, llm_model: str, api_key: str | None
     undoc = []
     for t in model.tables:
         if not t.description:
-            undoc.append(f"[table] {t.name}")
+            undoc.append({"type": "table", "path": t.name})
         for m in t.measures:
             if not m.description:
-                undoc.append(f"[measure] {t.name}.[{m.name}]")
+                undoc.append({"type": "measure", "path": f"{t.name}.[{m.name}]"})
         for c in t.columns:
             if not c.description and not c.is_hidden:
-                undoc.append(f"[column] {t.name}.{c.name}")
+                undoc.append({"type": "column", "path": f"{t.name}.{c.name}"})
 
     if not undoc:
-        console.print("[green]All objects are documented! Nothing to do.")
+        if fmt == "json":
+            click.echo(json.dumps({"undocumented": [], "generated": []}, indent=2))
+        else:
+            console.print("[green]All objects are documented! Nothing to do.")
         return
 
-    console.print(f"Found {len(undoc)} undocumented objects:")
-    for u in undoc:
-        console.print(f"  [dim]{u}[/dim]")
+    if fmt == "json" and dry_run:
+        click.echo(json.dumps({"undocumented": undoc, "generated": []}, indent=2))
+        return
+
+    if fmt != "json":
+        console.print(f"Found {len(undoc)} undocumented objects:")
+        for u in undoc:
+            console.print(f"  [dim][{u['type']}] {u['path']}[/dim]")
 
     if dry_run:
         console.print("\n[yellow]Dry run — no LLM calls made.")
@@ -249,10 +371,17 @@ def document(model_path: str, provider: str, llm_model: str, api_key: str | None
     from daxops.document.generator import generate_descriptions
     results = generate_descriptions(model, provider, llm_model, api_key)
 
-    console.print(f"\n[green]Generated {len(results)} descriptions:")
-    for r in results:
-        console.print(f"\n  [bold]{r.object_path}[/bold]")
-        console.print(f"  [dim]/// {r.description}[/dim]")
+    if fmt == "json":
+        data = {
+            "undocumented": undoc,
+            "generated": [{"path": r.object_path, "description": r.description} for r in results],
+        }
+        click.echo(json.dumps(data, indent=2))
+    else:
+        console.print(f"\n[green]Generated {len(results)} descriptions:")
+        for r in results:
+            console.print(f"\n  [bold]{r.object_path}[/bold]")
+            console.print(f"  [dim]/// {r.description}[/dim]")
 
 
 @cli.command()
