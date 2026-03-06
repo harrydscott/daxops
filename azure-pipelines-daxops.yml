@@ -1,0 +1,73 @@
+# Azure DevOps Pipeline for DaxOps Model Quality
+# Copy this file to your repo and configure the modelPath variable.
+
+trigger:
+  paths:
+    include:
+      - '**/*.tmdl'
+      - '.daxops.yml'
+
+pr:
+  paths:
+    include:
+      - '**/*.tmdl'
+      - '.daxops.yml'
+
+parameters:
+  - name: modelPath
+    displayName: 'Path to TMDL model directory'
+    type: string
+    default: '.'
+
+variables:
+  pythonVersion: '3.12'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(pythonVersion)'
+    displayName: 'Set up Python $(pythonVersion)'
+
+  - script: pip install daxops
+    displayName: 'Install DaxOps'
+
+  - script: |
+      MODEL_PATH="${{ parameters.modelPath }}"
+      if [ ! -f "$MODEL_PATH/model.tmdl" ]; then
+        FOUND=$(find . -name "model.tmdl" -not -path "./.git/*" | head -1)
+        if [ -n "$FOUND" ]; then
+          MODEL_PATH=$(dirname "$FOUND")
+        fi
+      fi
+      echo "##vso[task.setvariable variable=modelPath]$MODEL_PATH"
+      echo "Detected model path: $MODEL_PATH"
+    displayName: 'Detect model path'
+
+  - script: |
+      daxops score "$(modelPath)" --format json | tee $(Build.ArtifactStagingDirectory)/score.json
+    displayName: 'DaxOps Score'
+
+  - script: |
+      daxops check "$(modelPath)" --format json | tee $(Build.ArtifactStagingDirectory)/check.json
+    displayName: 'DaxOps Check'
+
+  - task: PublishBuildArtifacts@1
+    condition: always()
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'daxops-results'
+    displayName: 'Publish DaxOps results'
+
+  - script: |
+      echo "## DaxOps Results"
+      echo ""
+      echo "### Score"
+      cat $(Build.ArtifactStagingDirectory)/score.json
+      echo ""
+      echo "### Health Check"
+      cat $(Build.ArtifactStagingDirectory)/check.json
+    displayName: 'Display results'
+    condition: always()
