@@ -11,6 +11,7 @@ from rich.table import Table as RichTable
 
 from daxops import __version__
 from daxops.config import DaxOpsConfig, load_config
+from daxops.progress import progress_status
 
 console = Console()
 
@@ -58,10 +59,13 @@ def score(ctx, model_path: str, fmt: str):
     from daxops.report.markdown import generate_score_report
 
     config = _get_config(ctx, model_path)
-    model = parse_model(model_path)
-    bronze = score_bronze(model)
-    silver = score_silver(model)
-    gold = score_gold(model)
+    show_progress = fmt == "terminal"
+    with progress_status(console, "Parsing model...", enabled=show_progress):
+        model = parse_model(model_path)
+    with progress_status(console, "Scoring model...", enabled=show_progress):
+        bronze = score_bronze(model)
+        silver = score_silver(model)
+        gold = score_gold(model)
 
     b = sum(c.score for c in bronze)
     s = sum(c.score for c in silver)
@@ -147,8 +151,11 @@ def check(ctx, model_path: str, fmt: str, severity: str | None, use_baseline: bo
     from daxops.baseline import load_baseline, filter_new_findings
 
     config = _get_config(ctx, model_path)
-    model = parse_model(model_path)
-    findings = run_health_checks(model)
+    show_progress = fmt == "terminal"
+    with progress_status(console, "Parsing model...", enabled=show_progress):
+        model = parse_model(model_path)
+    with progress_status(console, "Running health checks...", enabled=show_progress):
+        findings = run_health_checks(model)
 
     # Apply config exclude_rules
     if config.exclude_rules:
@@ -310,11 +317,13 @@ def report(ctx, model_path: str, fmt: str, output: str | None):
     from daxops.report.html import generate_html_report
 
     config = _get_config(ctx, model_path)
-    model = parse_model(model_path)
-    bronze = score_bronze(model)
-    silver = score_silver(model)
-    gold = score_gold(model)
-    findings = run_health_checks(model)
+    with progress_status(console, "Parsing model...", enabled=fmt != "json"):
+        model = parse_model(model_path)
+    with progress_status(console, "Scoring and checking model...", enabled=fmt != "json"):
+        bronze = score_bronze(model)
+        silver = score_silver(model)
+        gold = score_gold(model)
+        findings = run_health_checks(model)
 
     if fmt == "json":
         b = sum(c.score for c in bronze)
@@ -621,9 +630,12 @@ def bpa(model_path: str, rules_file: str, fmt: str):
     from daxops.parser.tmdl import parse_model
     from daxops.bpa import load_bpa_rules, run_bpa_checks, get_supported_rule_ids
 
-    model = parse_model(model_path)
-    rules = load_bpa_rules(Path(rules_file))
-    findings, unmapped = run_bpa_checks(model, rules)
+    show_progress = fmt == "terminal"
+    with progress_status(console, "Parsing model...", enabled=show_progress):
+        model = parse_model(model_path)
+    with progress_status(console, "Running BPA checks...", enabled=show_progress):
+        rules = load_bpa_rules(Path(rules_file))
+        findings, unmapped = run_bpa_checks(model, rules)
 
     if fmt == "json":
         data = {
