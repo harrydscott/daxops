@@ -12,7 +12,7 @@ import yaml
 from daxops.models.schema import SemanticModel
 
 
-class TestStatus(str, Enum):
+class MeasureTestStatus(str, Enum):
     PASS = "PASS"
     FAIL = "FAIL"
     ERROR = "ERROR"
@@ -32,7 +32,7 @@ class MeasureTestCase:
 class MeasureTestResult:
     """Result of running a single measure test."""
     test: MeasureTestCase
-    status: TestStatus
+    status: MeasureTestStatus
     actual: Any = None
     message: str = ""
 
@@ -98,7 +98,7 @@ def run_static_tests(model: SemanticModel, cases: list[MeasureTestCase]) -> list
         if not found:
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.ERROR,
+                status=MeasureTestStatus.ERROR,
                 message=f"Measure '{case.measure}' not found in model",
             ))
             continue
@@ -114,7 +114,7 @@ def run_static_tests(model: SemanticModel, cases: list[MeasureTestCase]) -> list
         if not measure.expression.strip():
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.ERROR,
+                status=MeasureTestStatus.ERROR,
                 message=f"Measure '{case.measure}' has an empty expression",
             ))
             continue
@@ -142,7 +142,7 @@ def run_static_tests(model: SemanticModel, cases: list[MeasureTestCase]) -> list
         if filter_errors:
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.ERROR,
+                status=MeasureTestStatus.ERROR,
                 message=f"Filter context errors: {'; '.join(filter_errors)}",
             ))
             continue
@@ -150,7 +150,7 @@ def run_static_tests(model: SemanticModel, cases: list[MeasureTestCase]) -> list
         # Static test passes — measure exists and is valid
         results.append(MeasureTestResult(
             test=case,
-            status=TestStatus.PASS,
+            status=MeasureTestStatus.PASS,
             message=f"Measure '{case.measure}' exists in '{table_name}' with valid expression",
         ))
 
@@ -178,7 +178,7 @@ def run_tests_with_reference(
         if not found:
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.ERROR,
+                status=MeasureTestStatus.ERROR,
                 message=f"Measure '{case.measure}' not found in model",
             ))
             continue
@@ -192,7 +192,7 @@ def run_tests_with_reference(
         if ref_key not in reference_data:
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.ERROR,
+                status=MeasureTestStatus.ERROR,
                 message=f"No reference data for '{ref_key}'",
             ))
             continue
@@ -204,28 +204,28 @@ def run_tests_with_reference(
             if abs(actual - case.expected) <= case.tolerance:
                 results.append(MeasureTestResult(
                     test=case,
-                    status=TestStatus.PASS,
+                    status=MeasureTestStatus.PASS,
                     actual=actual,
                     message=f"Expected {case.expected}, got {actual} (tolerance: {case.tolerance})",
                 ))
             else:
                 results.append(MeasureTestResult(
                     test=case,
-                    status=TestStatus.FAIL,
+                    status=MeasureTestStatus.FAIL,
                     actual=actual,
                     message=f"Expected {case.expected}, got {actual} (tolerance: {case.tolerance})",
                 ))
         elif actual == case.expected:
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.PASS,
+                status=MeasureTestStatus.PASS,
                 actual=actual,
                 message=f"Values match: {actual}",
             ))
         else:
             results.append(MeasureTestResult(
                 test=case,
-                status=TestStatus.FAIL,
+                status=MeasureTestStatus.FAIL,
                 actual=actual,
                 message=f"Expected {case.expected!r}, got {actual!r}",
             ))

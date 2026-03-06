@@ -9,7 +9,7 @@ from daxops.cli import cli
 from daxops.models.schema import SemanticModel, Table, Measure, Column
 from daxops.testing import (
     MeasureTestCase,
-    TestStatus,
+    MeasureTestStatus,
     load_test_cases,
     run_static_tests,
     run_tests_with_reference,
@@ -97,19 +97,19 @@ class TestStaticTests:
         cases = [MeasureTestCase(measure="Total Revenue", expected=100)]
         results = run_static_tests(simple_model, cases)
         assert len(results) == 1
-        assert results[0].status == TestStatus.PASS
+        assert results[0].status == MeasureTestStatus.PASS
 
     def test_missing_measure_errors(self, simple_model):
         cases = [MeasureTestCase(measure="Nonexistent", expected=0)]
         results = run_static_tests(simple_model, cases)
-        assert results[0].status == TestStatus.ERROR
+        assert results[0].status == MeasureTestStatus.ERROR
         assert "not found" in results[0].message
 
     def test_empty_expression_errors(self, simple_model):
         simple_model.tables[0].measures[0].expression = ""
         cases = [MeasureTestCase(measure="Total Revenue", expected=100)]
         results = run_static_tests(simple_model, cases)
-        assert results[0].status == TestStatus.ERROR
+        assert results[0].status == MeasureTestStatus.ERROR
         assert "empty expression" in results[0].message
 
     def test_filter_context_validation(self, simple_model):
@@ -119,7 +119,7 @@ class TestStaticTests:
             filter_context={"BadTable.Col": "x"},
         )]
         results = run_static_tests(simple_model, cases)
-        assert results[0].status == TestStatus.ERROR
+        assert results[0].status == MeasureTestStatus.ERROR
         assert "not found" in results[0].message
 
     def test_valid_filter_context(self, simple_model):
@@ -129,7 +129,7 @@ class TestStaticTests:
             filter_context={"Product.Category": "Electronics"},
         )]
         results = run_static_tests(simple_model, cases)
-        assert results[0].status == TestStatus.PASS
+        assert results[0].status == MeasureTestStatus.PASS
 
 
 class TestReferenceTests:
@@ -137,38 +137,38 @@ class TestReferenceTests:
         cases = [MeasureTestCase(measure="Total Revenue", expected=100.0)]
         ref = {"Total Revenue": {"value": 100.0}}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.PASS
+        assert results[0].status == MeasureTestStatus.PASS
 
     def test_mismatch_fails(self, simple_model):
         cases = [MeasureTestCase(measure="Total Revenue", expected=100.0)]
         ref = {"Total Revenue": {"value": 200.0}}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.FAIL
+        assert results[0].status == MeasureTestStatus.FAIL
 
     def test_within_tolerance(self, simple_model):
         cases = [MeasureTestCase(measure="Total Revenue", expected=100.0, tolerance=5.0)]
         ref = {"Total Revenue": {"value": 103.0}}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.PASS
+        assert results[0].status == MeasureTestStatus.PASS
 
     def test_outside_tolerance(self, simple_model):
         cases = [MeasureTestCase(measure="Total Revenue", expected=100.0, tolerance=1.0)]
         ref = {"Total Revenue": {"value": 105.0}}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.FAIL
+        assert results[0].status == MeasureTestStatus.FAIL
 
     def test_missing_reference_errors(self, simple_model):
         cases = [MeasureTestCase(measure="Total Revenue", expected=100.0)]
         ref = {}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.ERROR
+        assert results[0].status == MeasureTestStatus.ERROR
         assert "No reference data" in results[0].message
 
     def test_string_comparison(self, simple_model):
         cases = [MeasureTestCase(measure="Total Revenue", expected="high")]
         ref = {"Total Revenue": {"value": "high"}}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.PASS
+        assert results[0].status == MeasureTestStatus.PASS
 
     def test_filter_context_key(self, simple_model):
         cases = [MeasureTestCase(
@@ -178,7 +178,7 @@ class TestReferenceTests:
         )]
         ref = {"Total Revenue|Product.Category=Electronics": {"value": 50.0}}
         results = run_tests_with_reference(simple_model, cases, ref)
-        assert results[0].status == TestStatus.PASS
+        assert results[0].status == MeasureTestStatus.PASS
 
 
 class TestCLI:

@@ -38,14 +38,14 @@ class ComparisonResult:
     improved: bool = False
 
 
-def summarize_model(model: SemanticModel) -> ScoreSummary:
-    """Generate a score summary for a model."""
+def _summarize_with_findings(model: SemanticModel) -> tuple[ScoreSummary, list]:
+    """Generate a score summary and raw findings for a model."""
     bronze = sum(c.score for c in score_bronze(model))
     silver = sum(c.score for c in score_silver(model))
     gold = sum(c.score for c in score_gold(model))
     findings = run_health_checks(model)
 
-    return ScoreSummary(
+    summary = ScoreSummary(
         bronze=bronze,
         silver=silver,
         gold=gold,
@@ -54,15 +54,19 @@ def summarize_model(model: SemanticModel) -> ScoreSummary:
         findings_warnings=sum(1 for f in findings if f.severity == Severity.WARNING),
         findings_info=sum(1 for f in findings if f.severity == Severity.INFO),
     )
+    return summary, findings
+
+
+def summarize_model(model: SemanticModel) -> ScoreSummary:
+    """Generate a score summary for a model."""
+    summary, _ = _summarize_with_findings(model)
+    return summary
 
 
 def compare_models(before: SemanticModel, after: SemanticModel) -> ComparisonResult:
     """Compare two model versions and generate a comparison report."""
-    before_summary = summarize_model(before)
-    after_summary = summarize_model(after)
-
-    before_findings = run_health_checks(before)
-    after_findings = run_health_checks(after)
+    before_summary, before_findings = _summarize_with_findings(before)
+    after_summary, after_findings = _summarize_with_findings(after)
 
     before_keys = {f"{f.rule}:{f.object_path}" for f in before_findings}
     after_keys = {f"{f.rule}:{f.object_path}" for f in after_findings}

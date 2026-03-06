@@ -7,6 +7,9 @@ from enum import Enum
 
 from daxops.models.schema import SemanticModel
 
+# Shared pattern for technical table prefixes (used by health checks, scoring, fix)
+BAD_TABLE_PREFIX = re.compile(r"^(dim|fact|stg|vw|tbl|dbo)[_.]?", re.IGNORECASE)
+
 
 class Severity(str, Enum):
     ERROR = "ERROR"
@@ -41,13 +44,13 @@ def run_health_checks(model: SemanticModel) -> list[Finding]:
 def _naming_convention(model: SemanticModel) -> list[Finding]:
     findings = []
     for t in model.tables:
-        if re.match(r"^(dim|fact|stg|vw|tbl|dbo)[_.]?", t.name, re.IGNORECASE):
+        if BAD_TABLE_PREFIX.match(t.name):
             findings.append(Finding(
                 rule="NAMING_CONVENTION",
                 severity=Severity.WARNING,
                 message=f"Table '{t.name}' uses a technical prefix — use business-friendly names",
                 object_path=t.name,
-                recommendation=f"Rename table to remove prefix (e.g., '{re.sub(r'^(dim|fact|stg|vw|tbl|dbo)[_.]?', '', t.name, flags=re.IGNORECASE)}') or run 'daxops fix'",
+                recommendation=f"Rename table to remove prefix (e.g., '{BAD_TABLE_PREFIX.sub('', t.name)}') or run 'daxops fix'",
             ))
         for c in t.columns:
             if "_" in c.name:
@@ -114,11 +117,20 @@ def _missing_format(model: SemanticModel) -> list[Finding]:
 def _unused_columns(model: SemanticModel) -> list[Finding]:
     """Basic check: columns not referenced in any measure expression."""
     findings = []
+    # Collect all DAX across the entire model (measures reference cross-table)
+    all_model_dax = " ".join(
+        m.expression for t in model.tables for m in t.measures
+    )
     for t in model.tables:
-        all_dax = " ".join(m.expression for m in t.measures)
+        if not t.measures and not any(m.expression for ot in model.tables for m in ot.measures):
+            continue
         for c in t.columns:
-            if c.name not in all_dax and not c.is_hidden:
-                # Only flag if table has measures (otherwise everything is "unused")
+            if c.is_hidden:
+                continue
+            # Check for bracket-delimited references: [ColumnName] or Table[ColumnName]
+            bracket_ref = f"[{c.name}]"
+            if bracket_ref not in all_model_dax:
+                # Only flag if the table has measures (to avoid noise on pure dimension tables)
                 if t.measures:
                     findings.append(Finding(
                         rule="UNUSED_COLUMNS",
@@ -134,9 +146,10 @@ def _dax_complexity(model: SemanticModel) -> list[Finding]:
     findings = []
     for t in model.tables:
         for m in t.measures:
-            expr = m.expression.upper()
-            calc_count = expr.count("CALCULATE")
-            filter_count = expr.count("FILTER")
+            expr = m.expression
+            # Use word-boundary matching to avoid false positives on substrings
+            calc_count = len(re.findall(r"\bCALCULATE\b", expr, re.IGNORECASE))
+            filter_count = len(re.findall(r"\bFILTER\b", expr, re.IGNORECASE))
             if calc_count >= 3 or filter_count >= 2:
                 findings.append(Finding(
                     rule="DAX_COMPLEXITY",

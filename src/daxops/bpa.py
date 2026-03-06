@@ -193,8 +193,9 @@ def _check_division(rule: BpaRule, model: SemanticModel) -> list[Finding]:
     sev = BPA_SEVERITY_MAP.get(rule.severity, Severity.WARNING)
     for t in model.tables:
         for m in t.measures:
-            # Look for division not followed by a constant — simplified check
-            if re.search(r"/\s*[^0-9\s]", m.expression):
+            # Look for column/measure reference divided: ] / [  or ] / FUNC(
+            # Avoids matching URLs, comments, or division by constants
+            if re.search(r"\]\s*/\s*[\[\w]", m.expression):
                 findings.append(Finding(
                     rule=rule.id,
                     severity=sev,

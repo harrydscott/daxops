@@ -568,7 +568,7 @@ def test_cmd(model_path: str, test_file: str, reference: str | None, fmt: str):
         run_static_tests,
         run_tests_with_reference,
         load_reference_data,
-        TestStatus,
+        MeasureTestStatus,
     )
 
     model = parse_model(model_path)
@@ -580,9 +580,9 @@ def test_cmd(model_path: str, test_file: str, reference: str | None, fmt: str):
     else:
         results = run_static_tests(model, cases)
 
-    passed = sum(1 for r in results if r.status == TestStatus.PASS)
-    failed = sum(1 for r in results if r.status == TestStatus.FAIL)
-    errors = sum(1 for r in results if r.status == TestStatus.ERROR)
+    passed = sum(1 for r in results if r.status == MeasureTestStatus.PASS)
+    failed = sum(1 for r in results if r.status == MeasureTestStatus.FAIL)
+    errors = sum(1 for r in results if r.status == MeasureTestStatus.ERROR)
 
     if fmt == "json":
         data = {
@@ -606,7 +606,7 @@ def test_cmd(model_path: str, test_file: str, reference: str | None, fmt: str):
         }
         click.echo(json.dumps(data, indent=2))
     else:
-        status_icons = {TestStatus.PASS: "[green]PASS", TestStatus.FAIL: "[red]FAIL", TestStatus.ERROR: "[yellow]ERROR"}
+        status_icons = {MeasureTestStatus.PASS: "[green]PASS", MeasureTestStatus.FAIL: "[red]FAIL", MeasureTestStatus.ERROR: "[yellow]ERROR"}
         for r in results:
             icon = status_icons[r.status]
             desc = f" — {r.test.description}" if r.test.description else ""

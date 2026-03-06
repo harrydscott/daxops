@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from daxops.health.rules import BAD_TABLE_PREFIX
 from daxops.models.schema import SemanticModel
 
 
@@ -14,11 +15,6 @@ class CriterionResult:
     score: int  # 0, 1, or 2
     max_score: int = 2
     details: list[str] = field(default_factory=list)
-
-
-BAD_PREFIXES = re.compile(r"^(dim|fact|stg|vw|tbl|dbo)[_.]?", re.IGNORECASE)
-BAD_COLUMN_PATTERNS = re.compile(r"[_]|^[a-z][a-zA-Z]*[A-Z]")  # underscores or camelCase
-
 
 def score_bronze(model: SemanticModel) -> list[CriterionResult]:
     return [
@@ -33,7 +29,7 @@ def score_bronze(model: SemanticModel) -> list[CriterionResult]:
 
 
 def _table_names(model: SemanticModel) -> CriterionResult:
-    bad = [t.name for t in model.tables if BAD_PREFIXES.match(t.name)]
+    bad = [t.name for t in model.tables if BAD_TABLE_PREFIX.match(t.name)]
     total = len(model.tables)
     if not bad:
         score = 2
