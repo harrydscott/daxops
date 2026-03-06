@@ -438,6 +438,78 @@ def document(model_path: str, fmt: str, provider: str, llm_model: str, api_key: 
 
 
 @cli.command()
+@click.argument("model_path", type=click.Path(exists=True))
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+def info(model_path: str, fmt: str):
+    """Show model statistics — tables, columns, measures, relationships."""
+    from daxops.parser.tmdl import parse_model
+
+    model = parse_model(model_path)
+
+    table_ct = len(model.tables)
+    col_ct = sum(len(t.columns) for t in model.tables)
+    hidden_ct = sum(1 for t in model.tables for c in t.columns if c.is_hidden)
+    meas_ct = sum(len(t.measures) for t in model.tables)
+    desc_ct = sum(1 for t in model.tables for m in t.measures if m.description)
+    rel_ct = len(model.relationships)
+    bidi_ct = sum(1 for r in model.relationships if r.cross_filtering == "both")
+    role_ct = len(model.roles)
+    calc_ct = sum(1 for t in model.tables for c in t.columns if c.expression)
+
+    stats = {
+        "name": model.name,
+        "culture": model.culture,
+        "tables": table_ct,
+        "columns": col_ct,
+        "hidden_columns": hidden_ct,
+        "calculated_columns": calc_ct,
+        "measures": meas_ct,
+        "measures_with_description": desc_ct,
+        "relationships": rel_ct,
+        "bidirectional_relationships": bidi_ct,
+        "roles": role_ct,
+    }
+
+    if fmt == "json":
+        # Add per-table breakdown
+        stats["table_details"] = [
+            {
+                "name": t.name,
+                "columns": len(t.columns),
+                "measures": len(t.measures),
+                "partitions": len(t.partitions),
+                "description": bool(t.description),
+            }
+            for t in model.tables
+        ]
+        click.echo(json.dumps(stats, indent=2))
+    else:
+        console.print(f"\n[bold]{model.name}[/bold]", end="")
+        if model.culture:
+            console.print(f" [dim]({model.culture})[/dim]")
+        else:
+            console.print()
+        console.print("━" * 40)
+        console.print(f"  Tables:          {table_ct}")
+        console.print(f"  Columns:         {col_ct} ({hidden_ct} hidden, {calc_ct} calculated)")
+        console.print(f"  Measures:        {meas_ct} ({desc_ct} documented)")
+        console.print(f"  Relationships:   {rel_ct}" + (f" ({bidi_ct} bidirectional)" if bidi_ct else ""))
+        if role_ct:
+            console.print(f"  Roles:           {role_ct}")
+
+        if table_ct:
+            console.print("\n[bold]Tables:")
+            for t in sorted(model.tables, key=lambda t: t.name):
+                parts = []
+                if t.columns:
+                    parts.append(f"{len(t.columns)} cols")
+                if t.measures:
+                    parts.append(f"{len(t.measures)} measures")
+                detail = f" [dim]({', '.join(parts)})[/dim]" if parts else ""
+                console.print(f"  {t.name}{detail}")
+
+
+@cli.command()
 @click.argument("output_path", type=click.Path())
 def init(output_path: str):
     """Initialize a sample TMDL model for testing."""

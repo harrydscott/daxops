@@ -73,6 +73,14 @@ daxops bpa ./my-model/ BPARules.json
 daxops badge ./my-model/ -o badge.svg
 daxops badge ./my-model/ --style score --format json
 
+# Quick model diagnostics
+daxops info ./my-model/
+daxops info ./my-model/ --format json
+
+# Scan a live Power BI dataset via XMLA endpoint
+daxops scan "My Workspace" "My Dataset"
+daxops scan "My Workspace" "My Dataset" --output model.json
+
 # Create a sample model to try it out
 daxops init ./sample/
 ```
@@ -349,6 +357,30 @@ DaxOps ships with a Contoso Sales sample model containing intentional issues:
 daxops score samples/contoso-sales/
 daxops check samples/contoso-sales/
 ```
+
+## XMLA Endpoint Scanner
+
+Scan live Power BI datasets directly from the service via XMLA endpoint:
+
+```bash
+# Install XMLA dependencies
+pip install daxops[xmla]    # pyadomd + azure-identity
+# OR
+pip install daxops[fabric]  # sempy-fabric
+
+# Scan a dataset
+daxops scan "My Workspace" "Sales Dataset"
+daxops scan "My Workspace" "Sales Dataset" --format json
+daxops scan "My Workspace" "Sales Dataset" --output model.json
+
+# Use environment variables for authentication
+export AZURE_TENANT_ID=...
+export AZURE_CLIENT_ID=...
+export AZURE_CLIENT_SECRET=...
+daxops scan "My Workspace" "Sales Dataset"
+```
+
+The scanned model is converted to the same internal format as the TMDL parser, so all scoring, health checks, and reporting work identically on live models.
 
 ## VS Code Extension
 
