@@ -414,10 +414,47 @@ Generate descriptions for undocumented objects using an LLM:
 # Dry run — see what would be documented
 daxops document ./my-model/ --dry-run
 
-# Generate with OpenAI
+# Generate with OpenAI (CLI)
 export OPENAI_API_KEY=sk-...
 daxops document ./my-model/ --provider openai --model gpt-4o
 ```
+
+### Interactive AI Description Editor
+
+The web app includes a full AI description workflow with human-in-the-loop review:
+
+```bash
+# Install LLM dependencies
+pip install daxops[llm]    # openai, anthropic, keyring
+
+# Launch the web app
+daxops app --model-path ./my-model/
+```
+
+1. Go to **Settings** and configure your AI provider (OpenAI, Azure OpenAI, or Anthropic)
+2. API keys are stored in your OS keychain via `keyring` — never in config files
+3. Click **Test Connection** to verify your setup
+4. Navigate to the **Describe** tab
+5. Click **Generate All** to generate descriptions for undocumented objects
+6. Review, edit, approve, or reject each description
+7. Click **Write to Model** to write approved descriptions to your TMDL files
+
+The workflow follows a strict staged process:
+
+```
+Pending -> [Generate] -> Generated -> [Edit] -> Edited -> [Approve] -> Approved -> [Write] -> Written
+```
+
+- Descriptions are **never written without explicit approval**
+- **Bulk Approve** for confident users, per-object review by default
+- **Regenerate** individual descriptions after editing DAX
+- **Real-time progress** via WebSocket during generation
+- **Automatic backup** before writing (undo-able via `.daxops-backup/`)
+
+Supported providers:
+- **OpenAI** — GPT-4o (default), GPT-4, GPT-3.5
+- **Azure OpenAI** — any deployed model (requires endpoint URL)
+- **Anthropic** — Claude Sonnet 4.5, Claude Haiku
 
 ## Sample Model
 
