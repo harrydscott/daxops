@@ -17,11 +17,20 @@ class FindingItem(BaseModel):
     recommendation: str | None
 
 
+class RuleBreakdown(BaseModel):
+    rule: str
+    errors: int
+    warnings: int
+    info: int
+    total: int
+
+
 class CheckSummary(BaseModel):
     total: int
     errors: int
     warnings: int
     info: int
+    by_rule: list[RuleBreakdown]
 
 
 class CheckResponse(BaseModel):
@@ -74,6 +83,33 @@ def get_check(
     warn_ct = sum(1 for f in findings if f.severity == Severity.WARNING)
     info_ct = sum(1 for f in findings if f.severity == Severity.INFO)
 
+    # Build per-rule breakdown
+    rule_counts: dict[str, dict[str, int]] = {}
+    for f in findings:
+        if f.rule not in rule_counts:
+            rule_counts[f.rule] = {"errors": 0, "warnings": 0, "info": 0}
+        if f.severity == Severity.ERROR:
+            rule_counts[f.rule]["errors"] += 1
+        elif f.severity == Severity.WARNING:
+            rule_counts[f.rule]["warnings"] += 1
+        else:
+            rule_counts[f.rule]["info"] += 1
+
+    by_rule = sorted(
+        [
+            RuleBreakdown(
+                rule=rule,
+                errors=counts["errors"],
+                warnings=counts["warnings"],
+                info=counts["info"],
+                total=counts["errors"] + counts["warnings"] + counts["info"],
+            )
+            for rule, counts in rule_counts.items()
+        ],
+        key=lambda r: (r.errors, r.warnings, r.total),
+        reverse=True,
+    )
+
     return CheckResponse(
         findings=[
             FindingItem(
@@ -85,5 +121,5 @@ def get_check(
             )
             for f in findings
         ],
-        summary=CheckSummary(total=len(findings), errors=error_ct, warnings=warn_ct, info=info_ct),
+        summary=CheckSummary(total=len(findings), errors=error_ct, warnings=warn_ct, info=info_ct, by_rule=by_rule),
     )

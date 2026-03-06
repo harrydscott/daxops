@@ -112,7 +112,9 @@
             <template x-if="checkData">
                 <div class="card section-gap">
                     <div class="card-title">Health Check Summary</div>
-                    <div style="display: flex; gap: 16px; align-items: center; margin-top: 8px;">
+
+                    <!-- Totals bar -->
+                    <div style="display: flex; gap: 16px; align-items: center; margin-top: 8px; margin-bottom: 16px;">
                         <span class="chip chip-error" @click="filterSeverity = 'ERROR'; screen = 'findings'" style="cursor:pointer;">
                             <span x-text="checkData.summary.errors"></span> Errors
                         </span>
@@ -123,28 +125,43 @@
                             <span x-text="checkData.summary.info"></span> Info
                         </span>
                         <span style="color: var(--text-dim); font-size: 13px;">
-                            <span x-text="checkData.summary.total"></span> total findings
+                            <span x-text="checkData.summary.total"></span> total
                         </span>
                     </div>
 
-                    <!-- Top 5 findings -->
-                    <template x-if="checkData.findings.length > 0">
-                        <div style="margin-top: 16px;">
-                            <div style="font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px;">Top findings</div>
-                            <template x-for="f in checkData.findings.slice(0, 5)" :key="f.object_path + f.rule">
-                                <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border);">
-                                    <span class="sev-icon" :class="sevClass(f.severity)" x-text="sevIcon(f.severity)"></span>
-                                    <span style="font-weight: 500;" x-text="f.rule"></span>
-                                    <span style="color: var(--text-dim);" x-text="f.object_path"></span>
-                                    <span style="margin-left: auto; font-size: 13px; color: var(--text-dim);" x-text="f.message"></span>
-                                </div>
-                            </template>
-                            <template x-if="checkData.findings.length > 5">
-                                <button class="btn" style="margin-top: 8px;" @click="screen = 'findings'">
-                                    View all <span x-text="checkData.findings.length"></span> findings
-                                </button>
-                            </template>
-                        </div>
+                    <!-- Rule × Severity matrix -->
+                    <template x-if="checkData.summary.by_rule && checkData.summary.by_rule.length > 0">
+                        <table class="matrix-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Rule</th>
+                                    <th style="text-align: center; width: 80px;">Errors</th>
+                                    <th style="text-align: center; width: 80px;">Warnings</th>
+                                    <th style="text-align: center; width: 80px;">Info</th>
+                                    <th style="text-align: center; width: 70px;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="r in checkData.summary.by_rule" :key="r.rule">
+                                    <tr style="cursor: pointer;" @click="filterRule = r.rule; filterSeverity = ''; screen = 'findings'">
+                                        <td style="font-weight: 500;" x-text="r.rule"></td>
+                                        <td style="text-align: center;"><span x-text="r.errors || '—'" :style="r.errors ? 'color: var(--error); font-weight: 600;' : 'color: var(--text-dim);'"></span></td>
+                                        <td style="text-align: center;"><span x-text="r.warnings || '—'" :style="r.warnings ? 'color: var(--warning); font-weight: 600;' : 'color: var(--text-dim);'"></span></td>
+                                        <td style="text-align: center;"><span x-text="r.info || '—'" :style="r.info ? 'color: var(--accent); font-weight: 600;' : 'color: var(--text-dim);'"></span></td>
+                                        <td style="text-align: center; font-weight: 600;" x-text="r.total"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                            <tfoot>
+                                <tr style="border-top: 2px solid var(--border);">
+                                    <td style="font-weight: 600;">Total</td>
+                                    <td style="text-align: center; font-weight: 600; color: var(--error);" x-text="checkData.summary.errors"></td>
+                                    <td style="text-align: center; font-weight: 600; color: var(--warning);" x-text="checkData.summary.warnings"></td>
+                                    <td style="text-align: center; font-weight: 600; color: var(--accent);" x-text="checkData.summary.info"></td>
+                                    <td style="text-align: center; font-weight: 600;" x-text="checkData.summary.total"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </template>
 
                     <template x-if="checkData.findings.length === 0">

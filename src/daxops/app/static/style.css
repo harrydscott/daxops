@@ -181,6 +181,34 @@ body {
 .btn-primary:hover { background: var(--primary-hover); }
 
 /* Table */
+/* Matrix table (rule × severity) */
+.matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.matrix-table th {
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    border-bottom: 2px solid var(--border);
+}
+
+.matrix-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.matrix-table tbody tr:hover { background: var(--bg); }
+
+.matrix-table tfoot td {
+    padding: 10px 12px;
+}
+
 .findings-table {
     width: 100%;
     border-collapse: collapse;
