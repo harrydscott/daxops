@@ -1,0 +1,134 @@
+table Faneblad
+	lineageTag: a5caa279-eadc-420b-ab7e-b11ce55bd1ad
+
+	column Komponent
+		lineageTag: 5d928ba9-a0e7-4d04-9f17-09ff9f610a73
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Komponent]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Note
+		lineageTag: c0530a52-1509-4f0d-beca-45e4bc83a593
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Note]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Komponent+Note = [Komponent] & [Note]
+		lineageTag: 4bf30855-dfeb-47ff-a543-443a01a1634f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fanebladselement
+		lineageTag: 1d9237fe-a245-4c03-b719-8b8af66a0db4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Fanebladselement]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Faneblad = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE(
+				    "Fanebladselement", STRING,
+				    "Komponent", STRING,
+				    "Note", STRING,
+				    {
+				        {"Adgang Dokument", "SOP.FrontEnd.Services.Implementation.Dokument.DokumentService", "Visning Dokumentoverblik#Dokument"},
+				        {"Adgang Part", "SOP.FrontEnd.Services.Implementation.Part.PartService", "Visning#Person"},
+				        {"Adgang Part", "SOP.FrontEnd.Services.Implementation.Part.PartService", "Visning#Virksomhed"},
+				        {"Adgang Sag", "SOP.FrontEnd.Services.Implementation.Sag.SagService", "Visning Sagsoverblik#Sag"},
+				        {"Adressehistorik", "SOP.FrontEnd.Services.Implementation.AddressHistorySearch.AddressHistorySearchSe", "Historisk Adressesøgning"},
+				        {"Adressehistorik", "SOP.FrontEnd.Services.Implementation.Adressehistorik.AdressehistorikService", "Søgning"},
+				        {"Adviser", "SOP.FrontEnd.Services.Implementation.Advis.AdvisService", "Visning Adviser"},
+				        {"Afregningslog", "SOP.Administration.Controllers.AfregningslogController", "Afregningslogudtræk"},
+				        {"Bopælssamlinger (liste)", "SOP.FrontEnd.Services.Implementation.Bopaelssamling.BopaelssamlingService", "Visning Bopælssamlinger"},
+				        {"Bopælssamlinger (visuel)", "SOP.FrontEnd.Services.Implementation.Bopaelssamling.BopaelssamlingService", "Visning BopælssamlingerDiagram"},
+				        {"Borgerblikket aftaler og frister", "SOP.FrontEnd.Services.Implementation.BobAftalerOgFrister.BobAftalerOgFristerServ", "Visning BobAftalerOgFrister"},
+				        {"Borgerblikket betalinger", "SOP.FrontEnd.Services.Implementation.GaeldOgBetalinger.BetalingService", "Visning Betalinger"},
+				        {"Borgerblikket Fordringskonfiguration", "SOP.Administration.Services.Implementation.ADDAAdministrationService", "Administration Borgerblikket"},
+				        {"Borgerblikket KLE-Konfiguration", "SOP.Administration.Services.Implementation.ADDAAdministrationService", "Administration Borgerblikket"},
+				        {"Borgerblikket sager", "SOP.FrontEnd.Services.Implementation.BorgerblikketData.BorgerblikketDataService", "Visning BorgerblikketData"},
+				        {"Borgerblikket serviceydelser og hjælpemidler", "SOP.FrontEnd.Services.Implementation.BorgerblikketData.BorgerblikketDataService", "Visning BorgerblikketData"},
+				        {"Borgerblikket økonomiske ydelser", "SOP.FrontEnd.Controllers.Repository.RepositoryController", "Modal Åbnet : Bruger"},
+				        {"Borgerblikket økonomiske ydelser", "SOP.FrontEnd.Services.Implementation.BorgerblikketData.BorgerblikketDataService", "Visning BorgerblikketData"},
+				        {"Brugerindstilling", "SOP.FrontEnd.Services.Implementation.CprMaskingService", "CPR Skjul sidste 4 cifre"},
+				        {"Brugerindstilling", "SOP.FrontEnd.Services.Implementation.CprMaskingService", "CPR Vis sidste 4 cifre"},
+				        {"DialogIntegration", "SOP.FrontEnd.Controllers.ExternalRedirectController", "DialogIntegration"},
+				        {"DialogIntegration", "SOP.FrontEnd.Handlers.DialogIntegrationHandler", "DialogIntegration"},
+				        {"Digital Logbog", "SOP.FrontEnd.Services.Implementation.DigitalLogbog.DigitalLogbogService", "Visning DigitalLogbogRegistreringer"},
+				        {"DokumentDetaljer", "SOP.FrontEnd.Services.Implementation.Dokument.DokumentService", "Visning Dokumentoverblik#Dokument"},
+				        {"Dokumenter", "SOP.FrontEnd.Services.Implementation.Dokument.DokumentService", "Visning Dokumenter#Sag"},
+				        {"Ejendomssager", "SOP.FrontEnd.Services.Implementation.Sag.SagService", "Visning Sager#Sag"},
+				        {"Familiesamlinger (liste)", "SOP.FrontEnd.Services.Implementation.Familiesamlinger.FamiliesamlingerServices", "Visning Familiesamlinger"},
+				        {"Familiesamlinger (visuel)", "SOP.FrontEnd.Services.Implementation.Familiesamlinger.FamiliesamlingerServices", "Visning FamiliesamlingerDiagram"},
+				        {"Faneblade", "SOP.Administration.Controllers.FanebladeController", "Faneblade Opdatering"},
+				        {"Forskudsopgørelse", "SOP.FrontEnd.Services.Implementation.Forskudsopgoerelse.ForskudsopgoerelseServic", "Visning Forskudsopgoerelse"},
+				        {"Helhedsoverblik", "SOP.FrontEnd.Services.Implementation.SagsOgYdelseTidsLinje.SagsOgYdelseTidslinje", "Søgning Sag"},
+				        {"Helhedsoverblik", "SOP.FrontEnd.Services.Implementation.SagsOgYdelseTidsLinje.SagsOgYdelseTidslinje", "Søgning Ydelser"},
+				        {"Ikke-økonomiske ydelser", "SOP.FrontEnd.Services.Implementation.Ydelser.YdelserService", "Visning IkkeOekonomiskeYdelser"},
+				        {"Ikke-økonomiske ydelser", "SOP.FrontEnd.Services.Implementation.Ydelser.YdelserService", "Visning Ydelser"},
+				        {"Indkomstoplysninger", "SOP.FrontEnd.Services.Implementation.IndkomstOplysninger.IndkomstOplysningerServ", "Modal Åbnet IndkomstOplysningerSammentaelling"},
+				        {"Indkomstoplysninger", "SOP.FrontEnd.Services.Implementation.IndkomstOplysninger.IndkomstOplysningerServ", "Visning IndkomstOplysninger"},
+				        {"Institutionsoplysninger", "SOP.FrontEnd.Services.Implementation.Skolegrunddata.SkolegrunddataService", "Visning Skolegrunddata"},
+				        {"Journalnotater", "SOP.Administration.Services.Implementation.JournalnoteService", "Journalnotat Visning"},
+				        {"Journalnotater", "SOP.FrontEnd.Services.Implementation.Journalnote.JournalnoteService", "Journalnotat Visning#Sag"},
+				        {"Kalenderaftaler fra Børne- og ungdomspsykiatrien", "SOP.FrontEnd.Services.Implementation.Aftaler.AftalService", "Visning Aftaler"},
+				        {"Kontroloplysninger", "SOP.FrontEnd.Services.Implementation.Kontroloplysninger.KontroloplysningerServic", "Visning Kontroloplysninger"},
+				        {"Kontrolsager på tværs af kommuner og UDK", "SOP.FrontEnd.Services.Implementation.HOK.KontrolsagsService", "Visning Kontrolsager#Kontrolsag"},
+				        {"Links", "SOP.Administration.Services.Implementation.LinksService", "Visning"},
+				        {"Loftsberegner", "SOP.FrontEnd.Services.Implementation.Loftsinformationer.LoftsinformationerServic", "Visning Loftvisning"},
+				        {"Målgruppe", "SOP.Administration.Services.Implementation.MaalgruppeService", "Visning"},
+				        {"Organisation", "SOP.FrontEnd.Controllers.Repository.RepositoryController", "Modal Åbnet : Bruger"},
+				        {"Organisation", "SOP.FrontEnd.Services.Implementation.OrganisationSearch.OrganisationSearchServic", "Søgning Afdelinger"},
+				        {"Organisation", "SOP.FrontEnd.Services.Implementation.OrganisationSearch.OrganisationSearchServic", "Søgning Brugere"},
+				        {"Parter", "", ""},
+				        {"Pensionsrettigheder", "SOP.FrontEnd.Services.Implementation.Pensionsrettigheder.PensionsrettighederServ", "Visning Pensionsrettigheder"},
+				        {"Persondetaljer", "SOP.FrontEnd.Services.Implementation.Part.PartService", "Visning Personoverblik#Person"},
+				        {"PersonSøgning", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning"},
+				        {"PersonSøgning", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning Person"},
+				        {"Prædefinerede titler", "SOP.Administration.Services.Implementation.PraedefineretTitelService", "Visning"},
+				        {"Revisionslog", "SOP.Administration.Controllers.RevisionslogController", "Revisionslogudtræk"},
+				        {"Sager", "SOP.FrontEnd.Services.Implementation.Sag.SagService", "Visning Sager#Sag"},
+				        {"Sagsdetaljer", "SOP.FrontEnd.Services.Implementation.Sag.SagService", "Visning Sagsoverblik#Sag"},
+				        {"Se Fuldt CPR", "SOP.FrontEnd.Controllers.PartController", "PartCpr"},
+				        {"Selvstændig virksomhed", "SOP.FrontEnd.Services.Implementation.SelvstaendigVirksomhedOplysninger.Selvstaen", "Visning SelvstaendigVirksomhedOplysninger"},
+				        {"Sessionstider", "SOP.Administration.Services.Implementation.SessionTimeoutService", "Visning"},
+				        {"Søgning Dokument", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning"},
+				        {"Søgning Dokument", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning Dokument"},
+				        {"Søgning Person", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning Person"},
+				        {"Søgning Sag", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning"},
+				        {"Søgning Sag", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning Sag"},
+				        {"Søgning Virksomhed", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning"},
+				        {"Søgning Virksomhed", "SOP.FrontEnd.Services.Implementation.Soege.SoegService", "Søgning Virksomhed"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.AdresseflytningerTimelin", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.AdviserTimelineProvider", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.DokumenterTimelineProvid", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.IkkeOekonomiskeYdelserAf", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.IkkeOekonomiskeYdelserSt", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.JournalnotaterTimelinePr", "Journalnotat Visning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.SagerTimelineProvider", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.YdelserAfsluttetTimeline", "Søgning"},
+				        {"Tidslinje", "SOP.FrontEnd.Services.Implementation.Timeline.Providers.YdelserStartetTimelinePr", "Søgning"},
+				        {"Tværgående Bemærkninger", "SOP.Administration.Services.Implementation.BemaerkningService", "Bemærkning"},
+				        {"Tværgående Bemærkninger", "SOP.Administration.Services.Implementation.BemaerkningService", "Visning"},
+				        {"Typer af Tværgående Bemærkninger", "SOP.Administration.Services.Implementation.BemaerkningTypeService", "Bemærkning"},
+				        {"Typer af Tværgående Bemærkninger", "SOP.Administration.Services.Implementation.BemaerkningTypeService", "Visning"},
+				        {"Virksomhedsoplysninger", "SOP.FrontEnd.Services.Implementation.Virksomhed.VirksomhedService", "Visning DigitalLogbogPligtliste"},
+				        {"Virksomhedsoplysninger", "SOP.FrontEnd.Services.Implementation.Virksomhed.VirksomhedService", "Visning Virksomhedsoverblik#Virksomhed"},
+				        {"Ydelser", "SOP.FrontEnd.Services.Implementation.Ydelser.YdelserService", "Visning Ydelser"},
+				        {"Ydelser på tværs af kommuner og UDK", "SOP.FrontEnd.Services.Implementation.Udk.UdkService", "Visning UdkYdelserService"},
+				        {"Årsopgørelser", "SOP.FrontEnd.Services.Implementation.Aarsopgoerelse.AarsopgoerelseService", "Visning Aarsopgoerelse"}
+				    }
+				)
+				
+				```
+
+	annotation PBI_Id = f61cdb115f2a4cc798ff1cb2dd1cf79a
+

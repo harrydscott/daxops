@@ -1,0 +1,342 @@
+table DateTables
+	lineageTag: 325efe92-becd-4855-ac4c-828ec78c6d17
+	sourceLineageTag: f5822116-e412-44aa-9eed-dd82f0a2f6f1
+
+	measure 'YTD Actuals' = EXTERNALMEASURE("YTD Actuals", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: f519414e-27b1-4100-8212-d9b1f8caf3d6
+		sourceLineageTag: 23a012da-13a1-419d-863b-cd74cbdbb58a
+		dataCategory: Uncategorized
+
+	measure 'PY YTD Actuals' = EXTERNALMEASURE("PY YTD Actuals", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: c60382f9-415a-46c4-a376-29e0c0f60ded
+		sourceLineageTag: d2a3fff8-2bd3-47e4-95a9-6ca2964a5033
+		dataCategory: Uncategorized
+
+	measure 'YoY % Growth' = EXTERNALMEASURE("YoY % Growth", DOUBLE, "DirectQuery to AS - Sales_incentives_part 1")
+		lineageTag: 108df417-b8fb-461d-b941-60c4501f323a
+		sourceLineageTag: 0e9ac4bd-10ed-4757-a739-d5528ef462d8
+		dataCategory: Uncategorized
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Actual = EXTERNALMEASURE("Actual", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: c0b893b3-a40b-4a46-94e6-d65728c6debc
+		sourceLineageTag: 64b53ff0-ab65-4bb4-8cc6-209595bdf54c
+		dataCategory: Uncategorized
+
+	measure Target = EXTERNALMEASURE("Target", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: 7be6c7c8-ce5a-4ac8-a413-ba078965504a
+		sourceLineageTag: aa8b567a-c4b8-48c1-bd4d-a035cc2818bd
+		dataCategory: Uncategorized
+
+	measure 'YTD Actual' = EXTERNALMEASURE("YTD Actual", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 93a0757d-a564-4542-bff5-f8f0c6979dfa
+		sourceLineageTag: 2bb124c7-de71-4ffd-a472-29664e549a35
+		dataCategory: Uncategorized
+
+	measure 'YTD Target' = EXTERNALMEASURE("YTD Target", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: e4730d9a-d345-4699-9bab-ca4ec1726bbd
+		sourceLineageTag: 375a987f-1d96-4d9f-9d4f-c8c583f3f620
+		dataCategory: Uncategorized
+
+	measure 'Total Achievement % (YTD Q2)' = EXTERNALMEASURE("Total Achievement % (YTD Q2)", DOUBLE, "DirectQuery to AS - Sales_incentives_part 1")
+		lineageTag: 1a7dbb6a-6aed-4eae-82c7-786531605d3d
+		sourceLineageTag: 59f91154-904c-470e-9ce7-2a3dfcd8a1cc
+		dataCategory: Uncategorized
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Achievement %' = EXTERNALMEASURE("Total Achievement %", DOUBLE, "DirectQuery to AS - Sales_incentives_part 1")
+		lineageTag: b059c2eb-68c3-46a1-8303-33b950b78cf2
+		sourceLineageTag: ebd4c6ac-8765-4791-bf85-f58f10f69b1e
+		dataCategory: Uncategorized
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Actuals' = EXTERNALMEASURE("Total Actuals", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: 80c9bc86-b5bb-475f-975e-171210903ef5
+		sourceLineageTag: 42017ab5-3d93-4b35-8aae-b450081d98ca
+		dataCategory: Uncategorized
+
+	measure 'Actual Feb' = EXTERNALMEASURE("Actual Feb", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: b70778a8-94ce-44c5-b057-86ca6271edab
+		sourceLineageTag: e14292c4-e690-4dcf-93fe-1b1b31da6eec
+		dataCategory: Uncategorized
+
+	measure 'Actual Mar' = EXTERNALMEASURE("Actual Mar", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: f7051305-d9d8-491d-b521-a425cfd4665b
+		sourceLineageTag: 2b073531-2c99-4198-971d-ba0b1704789c
+		dataCategory: Uncategorized
+
+	measure 'Actual Apr' = EXTERNALMEASURE("Actual Apr", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: d2e5d892-1dc1-481f-afc5-8e58c4a78abe
+		sourceLineageTag: 0e0c86cd-3539-4d58-9f26-8e811dc1298a
+		dataCategory: Uncategorized
+
+	measure 'Actual May' = EXTERNALMEASURE("Actual May", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: f4302ef0-8d24-420f-8091-7c82547345e9
+		sourceLineageTag: 46b20087-efc7-4c85-b14d-440140ee9b93
+		dataCategory: Uncategorized
+
+	measure 'Actual Jun' = EXTERNALMEASURE("Actual Jun", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: 30d8b3af-7d05-410a-9769-e892be0f11d4
+		sourceLineageTag: 3d59958f-072f-492c-9431-1709eb96e978
+		dataCategory: Uncategorized
+
+	measure 'Actual Jul' = EXTERNALMEASURE("Actual Jul", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: 6ce0e420-a9eb-4c56-a153-fac5c7b3f529
+		sourceLineageTag: d69f9c6a-ca65-4551-8919-72a875865007
+		dataCategory: Uncategorized
+
+	measure 'Actual Aug' = EXTERNALMEASURE("Actual Aug", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: 90a17c11-3c37-4451-9b33-ed9800b041c6
+		sourceLineageTag: 6e28ce13-e234-4ba2-99a8-a7886da39dd2
+		dataCategory: Uncategorized
+
+	measure 'Actual Sep' = EXTERNALMEASURE("Actual Sep", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: dcbf5c92-441b-4b4f-bf05-7c7b8a6690bb
+		sourceLineageTag: f39bae29-a497-44f6-9d9c-f7c4c6a5e20e
+		dataCategory: Uncategorized
+
+	measure 'Actual Oct' = EXTERNALMEASURE("Actual Oct", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: f78ed0cb-043a-4742-b66a-1d941fae0a31
+		sourceLineageTag: 42548275-b6e5-4d0d-a91e-21a3869b54c6
+		dataCategory: Uncategorized
+
+	measure 'Actual Nov' = EXTERNALMEASURE("Actual Nov", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: b5352bfa-bde8-4127-aae0-9c53df7fbbdd
+		sourceLineageTag: c825c14d-4090-42f0-bb9f-00d6a87366b2
+		dataCategory: Uncategorized
+
+	measure 'Actual Dec' = EXTERNALMEASURE("Actual Dec", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 75c42433-847a-47b3-9f0d-08716db6070d
+		sourceLineageTag: 85056796-f4e1-448e-95d1-a6676290accb
+		dataCategory: Uncategorized
+
+	measure 'Actuals Q1' = EXTERNALMEASURE("Actuals Q1", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 73685fa4-b4bb-41bb-8900-ae63f8cccffd
+		sourceLineageTag: f90d8bb7-4525-48b8-b3e6-dfaa17efa3a4
+		dataCategory: Uncategorized
+
+	measure 'Actuals Q2' = EXTERNALMEASURE("Actuals Q2", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 632c0f8a-615c-4561-9431-d6fdad3b5ddf
+		sourceLineageTag: ca37501d-235b-4e0b-a7a3-f8135aee8426
+		dataCategory: Uncategorized
+
+	measure 'Actuals Q3' = EXTERNALMEASURE("Actuals Q3", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: f782a4e3-78d6-46f9-a0db-0ca9ed99dfe1
+		sourceLineageTag: afd809d1-b09a-464a-9aaa-b4917fdfdbfd
+		dataCategory: Uncategorized
+
+	measure 'Actuals Q4' = EXTERNALMEASURE("Actuals Q4", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 55c3730d-d4a8-4695-b7ae-a6d70d3d7bdb
+		sourceLineageTag: b9f6cc86-6286-4098-850f-cfada4dd59a9
+		dataCategory: Uncategorized
+
+	measure 'Total Prod + Originations' = EXTERNALMEASURE("Total Prod + Originations", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 0dbc9597-7a7d-4d4f-ba91-626ffc74a283
+		sourceLineageTag: 4a8e0e4d-a631-49b5-a8bd-cdbf5daa7f49
+		dataCategory: Uncategorized
+
+	measure 'Max Prod + Originations' = EXTERNALMEASURE("Max Prod + Originations", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: 06904a54-c7bd-4ba8-95ab-b02b71231d21
+		sourceLineageTag: d7924744-1cf0-498d-a268-f641fe961033
+		dataCategory: Uncategorized
+
+	measure 'Total Prod + Actuals (Jan-Jun)' = EXTERNALMEASURE("Total Prod + Actuals (Jan-Jun)", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: d6e6e223-18ef-43c7-9d88-0a7ba51bddef
+		sourceLineageTag: b9772bd9-a3fc-4ae0-a555-38b186ce9313
+		dataCategory: Uncategorized
+
+	measure 'Total Prod + Target' = EXTERNALMEASURE("Total Prod + Target", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: e62dc245-1dcb-4fec-9d8c-905a25af9115
+		sourceLineageTag: 556d1282-de90-4e95-8278-36386b36ee5f
+		dataCategory: Uncategorized
+
+	measure 'Prod + Target (YTD Q2)' = EXTERNALMEASURE("Prod + Target (YTD Q2)", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: f5af434a-9f7b-40da-b2fb-b09370bfff79
+		sourceLineageTag: e7c3143d-8d2a-4b45-b758-54f511d66d53
+		dataCategory: Uncategorized
+
+	measure 'Actual Originations' = EXTERNALMEASURE("Actual Originations", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: 3ada6bca-5107-4462-a352-da5fb8ba8cdd
+		sourceLineageTag: 6b8eb824-6e67-4bc9-9773-140f688e598e
+		dataCategory: Uncategorized
+
+	measure 'Monthly Target' = EXTERNALMEASURE("Monthly Target", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: b4492d75-32d1-48f6-9417-e50dd35e90bb
+		sourceLineageTag: 51e1fddf-4426-49dd-be65-ddcd17209822
+		dataCategory: Uncategorized
+
+	measure 'Total Actual' = EXTERNALMEASURE("Total Actual", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: 0f8285c0-2ad2-47eb-aa88-3c5c8a2f3ea2
+		sourceLineageTag: 19dd287a-d84e-4adf-b990-7f0ffc97a508
+		dataCategory: Uncategorized
+
+	measure 'Actual Jan' = EXTERNALMEASURE("Actual Jan", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: #,0
+		lineageTag: fd941fdd-c7f7-415f-80db-500c33b2ad5f
+		sourceLineageTag: 68e3dcff-36d3-49e4-83fb-a5edc6bad658
+		dataCategory: Uncategorized
+
+	column Date
+		dataType: dateTime
+		isNullable: false
+		formatString: General Number
+		lineageTag: cb3ba5db-66db-470f-99c9-d55ba696dfdf
+		sourceLineageTag: 20f1fe3a-3f50-49a2-9a59-b111a01166e2
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Date
+
+		variation Variation
+			isDefault
+			relationship: 8bc45da9-5042-4e6a-94ff-ffdceb60f139
+			defaultHierarchy: LocalDateTable_0954abe1-1fb3-4ee9-a146-909096c3605c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = User
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: ce689f8e-30e1-4000-a46c-8369306c4b36
+		sourceLineageTag: 3a4f1a7e-53d3-45be-ba16-a3b4539ffe1d
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: f7c919b5-2aa1-4016-a9a6-0a609e51f3fc
+		sourceLineageTag: 5fa7f088-d307-48f7-9c29-df3bcce6e684
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Month Number
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 1324063a-d953-44a0-81d4-7accfcde3a0d
+		sourceLineageTag: 3036406f-8c6e-4f94-8b0e-d6984a83e70c
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = User
+
+	column Quarter
+		dataType: string
+		lineageTag: 3f6d4d6e-4535-4fde-af41-f81220ad184b
+		sourceLineageTag: 7891b1e6-22a5-4f69-bd41-00aa7d254e3d
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = User
+
+	column Year-Month
+		dataType: string
+		lineageTag: 23dc1ede-5b47-442d-afb4-b10d5c67a3af
+		sourceLineageTag: 1d2d88ee-c7ee-4543-8449-1acfa6cac8a9
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Year-Month
+
+		annotation SummarizationSetBy = User
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 82e5cfd2-50bd-47ce-b815-900d1766bbbf
+		sourceLineageTag: 453c7cf5-a7cb-4138-b63e-ba915e27d581
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = User
+
+	column Weekday
+		dataType: int64
+		formatString: 0
+		lineageTag: 434c9e50-f27a-44ed-b22d-739c85e188f9
+		sourceLineageTag: d2039c15-23f0-4649-904b-6378a49d61d1
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Weekday
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Short'
+		dataType: string
+		lineageTag: 3dc778bc-626c-409b-829f-fcac224d8df6
+		sourceLineageTag: 887df6b4-afcf-465d-9ea6-49c405c9e98f
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Month Short
+
+		annotation SummarizationSetBy = User
+
+	column 'Weekday Name'
+		dataType: string
+		lineageTag: 0faa95c5-0f8b-4730-b326-0d0f2891c331
+		sourceLineageTag: 402e75d6-5c7f-422e-a126-da3dc9515ea0
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Weekday Name
+
+		annotation SummarizationSetBy = User
+
+	column IsWeekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7808202c-9d66-435b-862c-70356be80572
+		sourceLineageTag: ee0e9147-39e1-4bfc-9cfd-26bd51c12f30
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: IsWeekend
+
+		annotation SummarizationSetBy = User
+
+	partition DateTables = entity
+		mode: directQuery
+		source
+			entityName: DateTable
+			expressionSource: 'DirectQuery to AS - Sales_incentives_part 1'
+
+	changedProperty = Name
+

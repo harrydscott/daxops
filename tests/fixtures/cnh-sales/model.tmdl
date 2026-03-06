@@ -1,0 +1,24 @@
+model Model
+	culture: en-IN
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["DirectQuery to AS - Sales_incentives_part 1"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table synthetic_sales_dataset_finalstestv
+ref table DateTables
+ref table GaugeTables
+ref table Target/Actuals/%s
+ref table 'synthetic_dealers (1)s'
+ref table Gauge_Table_1s
+ref table LocalDateTable_0954abe1-1fb3-4ee9-a146-909096c3605c
+
+ref cultureInfo en-IN
+

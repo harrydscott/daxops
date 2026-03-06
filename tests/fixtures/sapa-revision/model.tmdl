@@ -1,0 +1,44 @@
+model Model
+	culture: da-DK
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: da-DK
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Tables
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup Parameters
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Sources
+
+	annotation PBI_QueryGroupOrder = 2
+
+annotation PBI_QueryOrder = ["Revisionsdata","Mappe","Revisionslog","VIP","Overvågning","Søgekriterier (bruges ikke)"]
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Revisionsdata
+ref table DateTableTemplate_aaf2eb81-bf15-4acb-bd01-98558b4e0211
+ref table LocalDateTable_ff9e27ff-223a-47cf-a30f-a9497261a88b
+ref table VIP
+ref table Målinger
+ref table Alarmer
+ref table Kommuner
+ref table Dagstimer
+ref table Revisionslog
+ref table Formål
+ref table Overvågninger
+ref table Overvågning
+ref table LocalDateTable_9b7fa60f-2b46-418a-b715-1d097e0bb674
+ref table Søgekriterier
+ref table Faneblad
+
+ref cultureInfo da-DK
+

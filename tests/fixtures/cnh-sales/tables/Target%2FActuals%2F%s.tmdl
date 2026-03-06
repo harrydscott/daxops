@@ -1,0 +1,22 @@
+table Target/Actuals/%s
+	lineageTag: 3e37fa42-428e-4c61-8651-e7b79a86a9b9
+	sourceLineageTag: 8625c56f-62f9-4900-bb8c-6cf63f88d866
+
+	column Target/Actuals/%
+		dataType: string
+		lineageTag: 8ce452f8-3724-40e2-9c90-4c09f89ad9df
+		sourceLineageTag: bce37459-ec78-4f11-ad33-243603616b14
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Target/Actuals/%
+
+		annotation SummarizationSetBy = User
+
+	partition Target/Actuals/%s = entity
+		mode: directQuery
+		source
+			entityName: Target/Actuals/%
+			expressionSource: 'DirectQuery to AS - Sales_incentives_part 1'
+
+	changedProperty = Name
+

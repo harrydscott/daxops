@@ -1,0 +1,14 @@
+relationship 902497b4-7d9e-4c56-8d5e-fb31512d9cab
+	fromColumn: synthetic_sales_dataset_finalstestv.Date
+	toColumn: DateTables.Date
+
+relationship 09122e4f-be94-4b94-983f-d9b487c370a4
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: synthetic_sales_dataset_finalstestv.Index
+	toColumn: 'synthetic_dealers (1)s'.Index
+
+relationship 8bc45da9-5042-4e6a-94ff-ffdceb60f139
+	fromColumn: DateTables.Date
+	toColumn: LocalDateTable_0954abe1-1fb3-4ee9-a146-909096c3605c.Date
+

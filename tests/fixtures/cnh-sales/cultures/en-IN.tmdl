@@ -1,0 +1,704 @@
+cultureInfo en-IN
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "synthetic_sales_dataset_finals.region": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Region"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Region": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.ytd_actual_q1": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "YTD Actual Q1"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q1": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.actuals_ytd_q2": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Actuals YTD Q2"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q2": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.actuals_ytd_q3": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Actuals YTD Q3"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q3": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.actuals_ytd_q4": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Actuals YTD Q4"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q4": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__january": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % January"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "January": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__february": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % February"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "February": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__march": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % March"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "March": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__april": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % April"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "April": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__may": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % May"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "May": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__june": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % June"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "June": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__july": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % July"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "July": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__august": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % August"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "August": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__september": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % September"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "September": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__october": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % October"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "October": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__november": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % November"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "November": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.achievement__december": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Achievement % December"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "December": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_january": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target January"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "January": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_february": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target February"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "February": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_march": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target March"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "March": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_april": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target April"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "April": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_may": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target May"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "May": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_june": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target June"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "June": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_july": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target July"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "July": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_august": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target August"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "August": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_september": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target September"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "September": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_october": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target October"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "October": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_november": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target November"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "November": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_december": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target December"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "December": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_ytd_q1": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target YTD Q1"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q1": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_ytd_q2": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target YTD Q2"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q2": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_ytd_q3": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target YTD Q3"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q3": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "synthetic_sales_dataset_finals.target_ytd_q4": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "synthetic_sales_dataset_finalstestv",
+			          "ConceptualProperty": "Target YTD Q4"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "YTD Q4": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

@@ -1,0 +1,541 @@
+table Revisionsdata
+	lineageTag: 91f09200-d3ed-43ae-ac0a-91090d7a4ef8
+
+	column 'Log ID'
+		dataType: string
+		lineageTag: 2d961398-75e5-4b28-9277-db6b7eced040
+		summarizeBy: none
+		sourceColumn: Log ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Kald ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: e43b0901-ac11-4bd7-8a1b-23e03ed9ac03
+		summarizeBy: count
+		sourceColumn: Kald ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transaktions ID'
+		dataType: string
+		lineageTag: a91b2041-ce17-459a-aecc-8c0eb19f1a38
+		summarizeBy: none
+		sourceColumn: Transaktions ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aftale ID'
+		dataType: string
+		lineageTag: 974d3530-efce-4f01-ba33-49ea77bd9063
+		summarizeBy: none
+		sourceColumn: Aftale ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'KaldersAftale ID'
+		dataType: string
+		lineageTag: 48ba874e-dec2-434c-9e94-0fc76356d015
+		summarizeBy: none
+		sourceColumn: KaldersAftale ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Parametre
+		dataType: string
+		lineageTag: 36595820-b6a6-4ac7-ac4c-cb3cc6fa3d8c
+		summarizeBy: none
+		sourceColumn: Parametre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tidspunkt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fd88f206-0fb3-4650-9e04-bf82d5cec544
+		summarizeBy: none
+		sourceColumn: Tidspunkt
+
+		variation Variation
+			isDefault
+			relationship: 62fca89b-96ca-4c83-a02c-c4aafd72040b
+			defaultHierarchy: LocalDateTable_ff9e27ff-223a-47cf-a30f-a9497261a88b.Datohierarki
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Service ID'
+		dataType: string
+		lineageTag: f9838c5b-87ec-4ade-9593-b1b763fa8c15
+		summarizeBy: none
+		sourceColumn: Service ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'IP Adresse'
+		dataType: int64
+		formatString: 0
+		lineageTag: fe276ebd-899d-4d7a-a4cb-05e45013ff74
+		summarizeBy: sum
+		sourceColumn: IP Adresse
+
+		annotation SummarizationSetBy = Automatic
+
+	column Maskinnavn
+		dataType: string
+		lineageTag: 1f445fab-ec04-4b09-9291-8d52238ff24f
+		summarizeBy: none
+		sourceColumn: Maskinnavn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bruger ID'
+		dataType: string
+		lineageTag: 0d7f0665-0083-4fc3-8201-fdd6a9890499
+		summarizeBy: none
+		sourceColumn: Bruger ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column BrugerNavn
+		dataType: string
+		lineageTag: 4fa95edf-016a-4a8b-b503-3784a13ec72b
+		summarizeBy: none
+		sourceColumn: BrugerNavn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Bruger
+		dataType: string
+		lineageTag: a992cb56-38bc-4ec5-b52d-90f45f63d019
+		summarizeBy: none
+		sourceColumn: Bruger
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'IT-System ID'
+		dataType: string
+		lineageTag: 2977074a-8421-4eab-957c-fb03674c035c
+		summarizeBy: none
+		sourceColumn: IT-System ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Organisatorisk ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4fd36aa8-a88a-49c7-9166-c839d4467c68
+		summarizeBy: none
+		sourceColumn: Organisatorisk ID
+
+		annotation SummarizationSetBy = User
+
+	column 'Organisationsenhed ID'
+		dataType: string
+		lineageTag: 86de1f78-4146-4023-ae28-cd0c001cc19d
+		summarizeBy: none
+		sourceColumn: Organisationsenhed ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LOS-ID
+		dataType: string
+		lineageTag: 3f5b0244-dfd1-4131-af99-fd85f4a24dfd
+		summarizeBy: none
+		sourceColumn: LOS-ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LOS-Navn
+		dataType: string
+		lineageTag: fe65514e-7410-43d6-bfad-3270d1b1bcc5
+		summarizeBy: none
+		sourceColumn: LOS-Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Applikation
+		dataType: string
+		lineageTag: 3b6c836e-833e-4ea7-8f2f-efee3dbb7159
+		summarizeBy: none
+		sourceColumn: Applikation
+
+		annotation SummarizationSetBy = Automatic
+
+	column Komponent
+		dataType: string
+		lineageTag: 4ce01713-cfd1-42a1-a265-62b9c939f58e
+		summarizeBy: none
+		sourceColumn: Komponent
+
+		annotation SummarizationSetBy = Automatic
+
+	column Soegekriterier
+		dataType: string
+		lineageTag: 95cf141f-06f1-4bf2-9311-b50e37b9e6be
+		summarizeBy: none
+		sourceColumn: Soegekriterier
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sags ID'
+		dataType: string
+		lineageTag: 4ed46ffa-60ed-4f6e-b926-914d73e850a3
+		summarizeBy: none
+		sourceColumn: Sags ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Part
+		dataType: string
+		lineageTag: 2d4ee996-a1c5-4417-83c3-0229ec52cfa0
+		summarizeBy: none
+		sourceColumn: Part
+
+		annotation SummarizationSetBy = Automatic
+
+	column Aktoer
+		dataType: string
+		lineageTag: c2826daa-2346-457b-8cf7-2f733cefcc41
+		summarizeBy: none
+		sourceColumn: Aktoer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Anvendte CVR rettigheder'
+		dataType: string
+		lineageTag: 8c08823a-397f-471d-9804-39c312d4eeac
+		summarizeBy: none
+		sourceColumn: Anvendte CVR rettigheder
+
+		annotation SummarizationSetBy = Automatic
+
+	column Beskrivelse
+		dataType: string
+		lineageTag: 0b3c0cd6-b841-46d1-8a83-25bd12966e8f
+		summarizeBy: none
+		sourceColumn: Beskrivelse
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dato
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 5707d90a-3f8d-41d6-a6dd-3b45e4150aad
+		summarizeBy: none
+		sourceColumn: Dato
+
+		variation Variation
+			isDefault
+			relationship: 40b9c1f3-b7c2-41f2-ab72-a8178e55e2b2
+			defaultHierarchy: LocalDateTable_9b7fa60f-2b46-418a-b715-1d097e0bb674.Datohierarki
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tidspunkt på dagen'
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: f53a3f8c-d401-4a2f-8f34-a38c5dfe039b
+		summarizeBy: none
+		sourceColumn: Tidspunkt på dagen
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column Tilstandsskift
+		dataType: string
+		lineageTag: 655b35d1-5ed1-47a8-86ff-7275869fd2af
+		summarizeBy: none
+		sourceColumn: Tilstandsskift
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Organisatorisk enhed'
+		dataType: string
+		lineageTag: 6e2ccc8d-7365-4f26-a9e5-b0009e0aad4e
+		summarizeBy: none
+		sourceColumn: Organisatorisk enhed
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Vist Fra'
+		dataType: string
+		lineageTag: 721e56cc-43f4-49e3-9359-c6e110b106cb
+		summarizeBy: none
+		sourceColumn: Vist Fra
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sag
+		dataType: string
+		lineageTag: 4eea547b-f409-47cd-ac38-79198e067c80
+		summarizeBy: none
+		sourceColumn: Sag
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Partens bopælskommune'
+		dataType: string
+		lineageTag: 1fc7ba40-1a07-4248-a268-9837cadf1b2c
+		summarizeBy: none
+		sourceColumn: Partens bopælskommune
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sagsnummer
+		dataType: string
+		lineageTag: 0e52f588-893f-4ce5-ab06-6eaebf195d98
+		summarizeBy: none
+		sourceColumn: Sagsnummer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Adresse =
+			
+			IF (
+			    ISBLANK([Soegekriterier]) || NOT CONTAINSSTRING([Soegekriterier], "Adresse: "),
+			    "",
+			    IF (
+			        CONTAINSSTRING([Soegekriterier], "Adresse: ") && CONTAINSSTRING([Soegekriterier], ", VirksomhedStartDato:"),
+			        IF (
+			            FIND(", VirksomhedStartDato:", [Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])) = -1,
+			            SUBSTITUTE(MID([Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])), "null", ""),
+			            SUBSTITUTE(
+			                LEFT(
+			                    MID([Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])),
+			                    FIND(", VirksomhedStartDato:", [Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])) - FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) - 9
+			                ),
+			                "null",
+			                ""
+			            )
+			        ),
+			        IF (
+			            CONTAINSSTRING([Soegekriterier], "Adresse: ") && CONTAINSSTRING([Soegekriterier], ", Kommune:"),
+			            IF (
+			                FIND(", Kommune:", [Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])) = -1,
+			                SUBSTITUTE(MID([Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])), "null", ""),
+			                SUBSTITUTE(
+			                    LEFT(
+			                        MID([Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])),
+			                        FIND(", Kommune:", [Soegekriterier], FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) + 9, LEN([Soegekriterier])) - FIND("Adresse: ", [Soegekriterier], 1, LEN([Soegekriterier])) - 9
+			                    ),
+			                    "null",
+			                    ""
+			                )
+			            ),
+			            ""
+			        )
+			    )
+			)
+		lineageTag: 07d295e4-a78f-4494-99a6-c3091023df9f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ugedag = ```
+			
+			VAR DatoValue = [Dato]
+			VAR WeekdayNumber = WEEKDAY(DatoValue, 2)
+			RETURN 
+			    SWITCH(
+			        WeekdayNumber,
+			        1, "1) Mandag",
+			        2, "2) Tirsdag",
+			        3, "3) Onsdag",
+			        4, "4) Torsdag",
+			        5, "5) Fredag",
+			        6, "6) Lørdag",
+			        7, "7) Søndag"
+			    )
+			```
+		lineageTag: 25ab2a00-45b0-484c-a955-e47f2cce35e9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Match mellem Bruger og Part' = ```
+			
+			VAR part = LOWER([PartBorger])
+			VAR bruger = LOWER([BrugerKunNavn])
+			VAR lenPart = LEN(part)
+			VAR lenBruger = LEN(bruger)
+			VAR commonChars = 
+			    SUMX(
+			        GENERATESERIES(1, lenPart),
+			        IF(
+			            CONTAINSSTRING(bruger, MID(part, [Value], 1)),
+			            1,
+			            0
+			        )
+			    )
+			VAR maxLen = IF(lenPart > lenBruger, lenPart, lenBruger)
+			VAR score = ROUND(commonChars / maxLen, 2)
+			RETURN score
+			```
+		lineageTag: 7dbbb991-a178-468e-a92d-1f4f8156870e
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column klelvl3 = IF(CONTAINSSTRING([Sag], " - "), LEFT([Sag], FIND(" - ", [Sag]) - 1), [Sag])
+		lineageTag: f7b6dc88-3dde-4aa0-b9b8-96a92646a658
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column klelvl2 = IF([klelvl3] = "", "", LEFT([klelvl3], 5))
+		lineageTag: 8ae7796a-8b2d-41f9-b133-9fca38051998
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column klelvl1 = IF([klelvl3] = "", "", LEFT([klelvl3], 2))
+		lineageTag: 60327b99-4563-440f-9397-2bbcaae92996
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column PartBorger = IF(CONTAINSSTRING([Part], " - "), MID([Part], FIND(" - ", [Part]) + 3, LEN([Part]) - FIND(" - ", [Part]) - 2), [Part])
+		lineageTag: f10d732e-e077-46d9-926d-71823fe7b663
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column BrugerKunNavn = IF(CONTAINSSTRING([Bruger], "\"), MID([Bruger], FIND("\", [Bruger]) + 1, LEN([Bruger]) - FIND("\", [Bruger])), [Bruger])
+		lineageTag: e6bbb6bf-4ab9-4f9e-8abd-f4d57224dfb5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column CprNummer = SUBSTITUTE(IF(CONTAINSSTRING([Part], " - "), LEFT([Part], FIND(" - ", [Part]) - 1), [Part]), "-", "")
+		lineageTag: e78b112c-b280-484d-ae6c-f32e4271f2e1
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Time = HOUR([Tidspunkt på dagen])
+		formatString: 0
+		lineageTag: 7ab63035-1856-462a-bb4b-d4b08f385a7c
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column FormålType = ```
+			IF(
+			    CONTAINSSTRING([Soegekriterier], ", FormaalType: "), 
+			    LEFT(
+			        MID(
+			            [Soegekriterier], 
+			            FIND(", FormaalType: ", [Soegekriterier]) + LEN(", FormaalType: "), 
+			            LEN([Soegekriterier]) - FIND(", FormaalType: ", [Soegekriterier])
+			        ), 
+			        IFERROR(
+			            FIND(", ", MID(
+			                [Soegekriterier], 
+			                FIND(", FormaalType: ", [Soegekriterier]) + LEN(", FormaalType: "), 
+			                LEN([Soegekriterier]) - FIND(", FormaalType: ", [Soegekriterier])
+			            )) - 1,
+			            LEN([Soegekriterier]) - FIND(", FormaalType: ", [Soegekriterier])
+			        )
+			    ), 
+			    IF(
+			        CONTAINSSTRING([Soegekriterier], ", DuplaFormaalType: "), 
+			        LEFT(
+			            MID(
+			                [Soegekriterier], 
+			                FIND(", DuplaFormaalType: ", [Soegekriterier]) + LEN(", DuplaFormaalType: "), 
+			                LEN([Soegekriterier]) - FIND(", DuplaFormaalType: ", [Soegekriterier])
+			            ), 
+			            IFERROR(
+			                FIND(", ", MID(
+			                    [Soegekriterier], 
+			                    FIND(", DuplaFormaalType: ", [Soegekriterier]) + LEN(", DuplaFormaalType: "), 
+			                    LEN([Soegekriterier]) - FIND(", DuplaFormaalType: ", [Soegekriterier])
+			                )) - 1,
+			                LEN([Soegekriterier]) - FIND(", DuplaFormaalType: ", [Soegekriterier])
+			            )
+			        ), 
+			        ""
+			    )
+			)
+			```
+		lineageTag: 69bc7299-7cf9-42a3-81f8-21203bfab1cf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Beskrivelse+FormålType = [Beskrivelse] & [FormålType]
+		lineageTag: 7536c4f4-c29b-479e-8422-f4c6e28bff48
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Komponent+Note = [Komponent] & [Beskrivelse]
+		lineageTag: 63d23024-d0fc-454b-8b34-2978ef11dfd3
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Revisionsdata-aed044e0-84a0-4d25-a0f9-661753d8ddbc = m
+		mode: import
+		queryGroup: Tables
+		source =
+				let
+				    // Function to combine all CSV files in a folder
+				    CombineCSVFiles = (folderPath as text) as table =>
+				        let
+				            Source = Folder.Files(folderPath),
+				            CSVFiles = Table.SelectRows(Source, each Text.EndsWith([Extension], ".csv")),
+				            Combined = Table.Combine(
+				                Table.TransformRows(CSVFiles, each Csv.Document(File.Contents([Folder Path] & [Name]), [Delimiter=";"]))
+				            )
+				        in
+				            Combined,
+				
+				    // Define Kilde based on whether Mappe is defined or not
+				    Kilde = if Mappe = null or Mappe = "" then
+				                Revisionslog
+				            else
+				                CombineCSVFiles(Mappe),
+				
+				    // Promote headers and remove duplicates
+				    #"Overskrifter" = Table.PromoteHeaders(Kilde, [PromoteAllScalars=true]),
+				    #"Fjernede dubletter" = Table.Distinct(#"Overskrifter", {"Log ID"}),
+				
+				    // Replace null values
+				    Brugerdefineret1 = Table.ReplaceValue(#"Fjernede dubletter", null, "", Replacer.ReplaceValue, {"Log ID", "Kald ID", "Transaktions ID", "Aftale ID", "KaldersAftale ID", "Parametre", "Service ID", "IP Adresse", "Maskinnavn", "Bruger ID", "BrugerNavn", "Bruger", "IT-System ID", "Organisatorisk ID", "Organisationsenhed ID", "LOS-ID", "LOS-Navn", "Applikation", "Komponent", "Soegekriterier", "Sags ID", "Tilstandsskift", "Part", "Aktoer", "Anvendte CVR rettigheder", "Beskrivelse", "Organisatorisk enhed", "Vist Fra", "Sag", "Partens bopælskommune"}),
+				
+				    // Change column types
+				    #"Ændret type" = Table.TransformColumnTypes(Brugerdefineret1, {{"Log ID", type text}, {"Kald ID", Int64.Type}, {"Transaktions ID", type text}, {"Aftale ID", type any}, {"KaldersAftale ID", type any}, {"Parametre", type text}, {"Tidspunkt", type datetimezone}, {"Service ID", type any}, {"IP Adresse", Int64.Type}, {"Maskinnavn", type text}, {"Bruger ID", type text}, {"BrugerNavn", type text}, {"Bruger", type text}, {"IT-System ID", type any}, {"Organisatorisk ID", type text}, {"Organisationsenhed ID", type text}, {"LOS-ID", type text}, {"LOS-Navn", type text}, {"Applikation", type text}, {"Komponent", type text}, {"Soegekriterier", type text}, {"Sags ID", type any}, {"Tilstandsskift", type any}, {"Part", type text}, {"Aktoer", type text}, {"Anvendte CVR rettigheder", type text}, {"Beskrivelse", type text}, {"Organisatorisk enhed", type text}, {"Vist Fra", type text}, {"Sag", type text}, {"Partens bopælskommune", type text}}),
+				
+				    // Duplicate and change column types
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Ændret type", "Tidspunkt", "Dato"),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Duplicated Column", {{"Dato", type date}}),
+				
+				    // Trim text columns
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type", {{"Part", Text.Trim, type text}, {"Aktoer", Text.Trim, type text}, {"Bruger", Text.Trim, type text}, {"BrugerNavn", Text.Trim, type text}}),
+				
+				    // Duplicate and extract time
+				    #"Duplicated Column2" = Table.DuplicateColumn(#"Trimmed Text", "Tidspunkt", "Tidspunkt på dagen"),
+				    #"Extracted Time" = Table.TransformColumns(#"Duplicated Column2", {{"Tidspunkt på dagen", DateTime.Time, type time}}),
+				
+				    // Remove rows with errors
+				    #"Removed Errors1" = Table.RemoveRowsWithErrors(#"Extracted Time", {"Log ID", "Kald ID", "Transaktions ID", "Aftale ID", "KaldersAftale ID", "Parametre", "Tidspunkt", "Service ID", "IP Adresse", "Maskinnavn", "Bruger ID", "BrugerNavn", "Bruger", "IT-System ID", "Organisatorisk ID", "Organisationsenhed ID", "LOS-ID", "LOS-Navn", "Applikation", "Komponent", "Soegekriterier", "Sags ID", "Tilstandsskift", "Part", "Aktoer", "Anvendte CVR rettigheder", "Beskrivelse", "Organisatorisk enhed", "Vist Fra", "Sag", "Partens bopælskommune", "Dato", "Tidspunkt på dagen"}),
+				
+				    // Filter rows
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Errors1", each true),
+				
+				    // Change column types
+				    #"Changed ID Type" = Table.TransformColumnTypes(#"Filtered Rows", {{"Organisatorisk ID", Int64.Type}})
+				in
+				    #"Changed ID Type"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

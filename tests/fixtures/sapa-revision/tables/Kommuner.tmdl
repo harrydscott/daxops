@@ -1,0 +1,133 @@
+table Kommuner
+	lineageTag: c7b1f939-6ab2-4adb-8cf8-77e0597fe407
+
+	column Name
+		lineageTag: 1337f999-b6a9-4d7c-9681-6c29c3917c34
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column CVR
+		formatString: 0
+		lineageTag: b0f3fc20-5e2f-47fc-b6ec-2675aae357c2
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [CVR]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Kommuner = calculated
+		mode: import
+		source =
+				
+				DATATABLE (
+				    "Name", STRING,
+				    "CVR", INTEGER,
+				    {
+				        {"Frederiksberg", 11259979},
+				        {"Lyngby-Taarbæk", 11715311},
+				        {"Ishøj", 11931316},
+				        {"Korsbæk", 12345678},
+				        {"Dragør", 12881517},
+				        {"Ringsted", 18957981},
+				        {"Gentofte", 19438414},
+				        {"Høje Taastrup", 19501817},
+				        {"Vallensbæk", 19583910},
+				        {"Tårnby", 20310413},
+				        {"Samsø", 23795515},
+				        {"Bornholm", 26696348},
+				        {"Ærø", 28856075},
+				        {"Furesø", 29188327},
+				        {"Fredensborg", 29188335},
+				        {"Rudersdal", 29188378},
+				        {"Egedal", 29188386},
+				        {"Halsnæs", 29188416},
+				        {"Gribskov", 29188440},
+				        {"Odsherred", 29188459},
+				        {"Faxe", 29188475},
+				        {"Slagelse", 29188505},
+				        {"Lejre", 29188548},
+				        {"Lolland", 29188572},
+				        {"Guldborgsund", 29188599},
+				        {"Faaborg-Midtfyn", 29188645},
+				        {"Nordfyns", 29188947},
+				        {"Langeland", 29188955},
+				        {"Frederikssund", 29189129},
+				        {"Hillerød", 29189366},
+				        {"Køge", 29189374},
+				        {"Hjørring", 29189382},
+				        {"Roskilde", 29189404},
+				        {"Aalborg", 29189420},
+				        {"Jammerbugt", 29189439},
+				        {"Holbæk", 29189447},
+				        {"Mariagerfjord", 29189455},
+				        {"Rebild", 29189463},
+				        {"Vesthimmerlands", 29189471},
+				        {"Frederikshavn", 29189498},
+				        {"Brønderslev", 29189501},
+				        {"Thisted", 29189560},
+				        {"Skive", 29189579},
+				        {"Hedensted", 29189587},
+				        {"Kalundborg", 29189595},
+				        {"Ringkøbing-Skjern", 29189609},
+				        {"Ikast-Brande", 29189617},
+				        {"Næstved", 29189625},
+				        {"Skanderborg", 29189633},
+				        {"Silkeborg", 29189641},
+				        {"Randers", 29189668},
+				        {"Vordingborg", 29189676},
+				        {"Middelfart", 29189684},
+				        {"Assens", 29189692},
+				        {"Kerteminde", 29189706},
+				        {"Favrskov", 29189714},
+				        {"Nyborg", 29189722},
+				        {"Svendborg", 29189730},
+				        {"Haderslev", 29189757},
+				        {"Billund", 29189765},
+				        {"Sønderborg", 29189773},
+				        {"Tønder", 29189781},
+				        {"Esbjerg", 29189803},
+				        {"Varde", 29189811},
+				        {"Vejen", 29189838},
+				        {"Viborg", 29189846},
+				        {"Aabenraa", 29189854},
+				        {"Horsens", 29189889},
+				        {"Kolding", 29189897},
+				        {"Vejle", 29189900},
+				        {"Herning", 29189919},
+				        {"Holstebro", 29189927},
+				        {"Lemvig", 29189935},
+				        {"Struer", 29189951},
+				        {"Syddjurs", 29189978},
+				        {"Norddjurs", 29189986},
+				        {"Sorø", 29189994},
+				        {"Stevns", 29208654},
+				        {"Fanø", 31210917},
+				        {"Odder", 32264328},
+				        {"ATP", 33236239},
+				        {"Odense", 35209115},
+				        {"Morsø", 41333014},
+				        {"Greve", 44023911},
+				        {"Læsø", 45973328},
+				        {"Aarhus", 55133018},
+				        {"Hvidovre", 55606617},
+				        {"Ballerup", 58271713},
+				        {"Allerød", 60183112},
+				        {"Gladsaxe", 62761113},
+				        {"Herlev", 63640719},
+				        {"Helsingør", 64502018},
+				        {"København", 64942212},
+				        {"Brøndby", 65113015},
+				        {"Glostrup", 65120119},
+				        {"Rødovre", 65307316},
+				        {"Albertslund", 66137112},
+				        {"Solrød", 68534917},
+				        {"Fredericia", 69116418},
+				        {"Hørsholm", 70960516}
+				    }
+				)
+
+	annotation PBI_Id = 23fb2e8661cb4de5a86f6276bc73a6f9
+

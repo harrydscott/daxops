@@ -1,0 +1,79 @@
+table Overvågninger
+	lineageTag: c4816aec-1d4e-419b-b23a-c0cb72d926b2
+
+	column Overvågning
+		lineageTag: 8c036924-5ab5-4b78-a21c-43bb9cd59f22
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Overvågning]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Overvågning beskrivelse'
+		lineageTag: d7dd3f3e-848c-482e-9274-14cacb0d75b7
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Overvågning beskrivelse]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Log ID'
+		lineageTag: a7da4649-67e9-4349-9857-ec6c4fef6aab
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Log ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Overvågninger = calculated
+		mode: import
+		source =
+				
+				SELECTCOLUMNS(
+				    UNION(
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[Adresse] <> BLANK() &&
+				                COUNTROWS(
+				                    FILTER(
+				                        'Overvågning',
+				                        'Overvågning'[Sensitiv Adresse] <> BLANK() &&
+				                        SEARCH('Overvågning'[Sensitiv Adresse], 'Revisionsdata'[Adresse], 1, 0) > 0
+				                    )
+				                ) > 0
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Overvågning", "SENSITIV ADRESSE",
+				            "Overvågning beskrivelse", "Adresse ligner Adresse i Overvågning"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[PartBorger] <> BLANK() &&
+				                COUNTROWS(
+				                    FILTER(
+				                        'Overvågning',
+				                        'Overvågning'[Sensitiv Navn] <> BLANK() &&
+				                        SEARCH('Overvågning'[Sensitiv Navn], 'Revisionsdata'[PartBorger], 1, 0) > 0
+				                    )
+				                ) > 0
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Overvågning", "SENSITIV NAVN",
+				            "Overvågning beskrivelse", "Partens navn ligner Navn i Overvågning"
+				        ),
+				        ADDCOLUMNS(
+				            'Revisionsdata',
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Overvågning", "",
+				            "Overvågning beskrivelse", ""
+				        )
+				    ),
+				    "Log ID", [Log ID Temp],
+				    "Overvågning", [Overvågning],
+				    "Overvågning beskrivelse", [Overvågning beskrivelse]
+				)
+
+	annotation PBI_Id = e94a6e82d5fd4562ba2f731aae6d0cd0
+

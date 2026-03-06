@@ -1,0 +1,104 @@
+table Målinger
+	lineageTag: aa741674-a5fc-4648-9cbf-5c73797e1e8c
+
+	measure 'Antal søgninger' =
+			
+			CALCULATE(
+			    COUNTROWS('Revisionsdata'),
+			    LEFT('Revisionsdata'[Beskrivelse], 8) = "Søgning "
+			)
+		formatString: 0
+		lineageTag: 1fd96c9b-eb53-4ede-a5f6-0a2aa4e42ade
+
+	measure 'Aktivitet pr. unik bruger' = INT(ROUND(DIVIDE([Antal aktivitet],[Unikke brugere]),2))
+		formatString: 0
+		lineageTag: 21ea1a4b-14d5-4e88-a859-199f75146492
+
+	measure 'Antal gentagende søgninger' =
+			
+			CALCULATE(
+			    COUNTROWS('Revisionsdata'),
+			    FILTER(
+			        'Revisionsdata',
+			        LEFT('Revisionsdata'[Beskrivelse], 8) = "Søgning "
+			    ),
+			    ALLEXCEPT('Revisionsdata', 'Revisionsdata'[Bruger], 'Revisionsdata'[Part])
+			)
+		formatString: 0
+		lineageTag: e8787108-2e6b-4d40-95f2-92f8a269c17c
+
+	measure 'Antal aktivitet' = COUNTROWS('Revisionsdata')
+		formatString: 0
+		lineageTag: 2e4d5dc5-de5f-4d91-b83f-51e185e72cfb
+
+	measure 'Søgninger pr. unik bruger' = INT(ROUND(DIVIDE([Antal søgninger],[Unikke brugere]),2))
+		formatString: 0
+		lineageTag: bc6ef5b1-eeff-4ffe-9fe9-12c69fc38b74
+
+	measure 'Unikke brugere' = CALCULATE(COUNTROWS(DISTINCT(Revisionsdata[Bruger ID])),LEN('Revisionsdata'[Bruger ID])>0)
+		formatString: 0
+		lineageTag: 64859c75-a840-47c3-8fc0-c1c32fbc0678
+
+	measure Metadata =
+			
+			VAR LatestDate = MAX(Revisionsdata[Dato])
+			VAR LatestDateText = FORMAT(LatestDate, "dd-MM-yyyy")
+			VAR OrganisatoriskIDs = DISTINCT(SELECTCOLUMNS(FILTER(Revisionsdata, NOT(ISBLANK([Organisatorisk ID]))), "Organisatorisk ID", [Organisatorisk ID]))
+			VAR UpdatedIDs = CONCATENATEX(
+			    OrganisatoriskIDs,
+			    VAR currentID = [Organisatorisk ID]
+			    VAR match = LOOKUPVALUE(Kommuner[Name], Kommuner[CVR], currentID)
+			    RETURN
+			        IF(
+			            ISBLANK(match),
+			            "(CVR " & currentID & ")",
+			            match & " (CVR " & currentID & ")"
+			        ),
+			    ", "
+			)
+			RETURN
+			"Seneste dato i udtræk: " & LatestDateText & ". Kommune: " & UpdatedIDs
+		lineageTag: 581c7546-e3c6-4c66-844d-6524a45be1ad
+
+	measure 'Måneder siden' =
+			
+			DATEDIFF(
+			    CALCULATE(
+			        MAX(Revisionsdata[Dato]),
+			        ALLEXCEPT(Revisionsdata, Revisionsdata[BrugerNavn])
+			    ),
+			    CALCULATE(
+			        MAX(Revisionsdata[Dato]),
+			        ALL(Revisionsdata)
+			    ),
+			    MONTH
+			)
+		formatString: 0
+		lineageTag: a04e03e2-2106-43fc-b57a-2d10b994d5e4
+
+	measure 'Sidste dato' =
+			
+			CALCULATE(
+			    MAX(Revisionsdata[Dato]),
+			    ALLEXCEPT(Revisionsdata, Revisionsdata[BrugerNavn])
+			)
+		formatString: General Date
+		lineageTag: d707b840-4f51-4228-84be-c09498b5215a
+
+	column Column
+		formatString: 0
+		lineageTag: 25c67ba1-4b85-4ad2-955e-36fcde8a5158
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Målinger = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 427b999146b74058b9e514e3cc048276
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

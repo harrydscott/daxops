@@ -1,0 +1,49 @@
+table Dagstimer
+	lineageTag: 9073e2dd-b394-45e1-b285-3e4e8f3c6fb1
+
+	column Time
+		dataType: int64
+		formatString: 0
+		lineageTag: a643dfb3-9432-4a4e-b9de-2dfb1d5fabb0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Time]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dagstimer = calculated
+		mode: import
+		source =
+				
+				DATATABLE (
+				    "Time", INTEGER,
+				    {
+				        {0},
+				        {1},
+				        {2},
+				        {3},
+				        {4},
+				        {5},
+				        {6},
+				        {7},
+				        {8},
+				        {9},
+				        {10},
+				        {11},
+				        {12},
+				        {13},
+				        {14},
+				        {15},
+				        {16},
+				        {17},
+				        {18},
+				        {19},
+				        {20},
+				        {21},
+				        {22},
+				        {23}
+				    }
+				)
+
+	annotation PBI_Id = 9772052f9414411492a1a5a4a17108b1
+

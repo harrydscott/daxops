@@ -1,0 +1,150 @@
+table Alarmer
+	lineageTag: ed3f748d-055b-485a-b758-1fa1b6e98431
+
+	column Alarm
+		lineageTag: ade67107-94e6-49b8-a277-8436bb645708
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Alarm]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Alarm beskrivelse'
+		lineageTag: 15393c3e-127c-422a-88cb-66558c3e7e28
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Alarm beskrivelse]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Log ID'
+		lineageTag: 765f7eef-8afa-476b-96ea-ba8da24b80c2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Log ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Alarmer = calculated
+		mode: import
+		source =
+				
+				SELECTCOLUMNS(
+				    UNION(
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[klelvl3] <> BLANK() &&
+				                'Revisionsdata'[klelvl2] <> BLANK() &&
+				                'Revisionsdata'[klelvl1] <> BLANK() &&
+				                (CONTAINS(VIP, VIP[KLE], SUBSTITUTE('Revisionsdata'[klelvl3], ".", "")) ||
+				                CONTAINS(VIP, VIP[KLE], SUBSTITUTE('Revisionsdata'[klelvl2], ".", "")) ||
+				                CONTAINS(VIP, VIP[KLE], SUBSTITUTE('Revisionsdata'[klelvl1], ".", "")))
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "SENSITIV KLE",
+				            "Alarm beskrivelse", "KLE (1,2,3) matcher Sensitiv KLE i VIP"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[klelvl3] <> BLANK() &&
+				                'Revisionsdata'[klelvl2] <> BLANK() &&
+				                'Revisionsdata'[klelvl1] <> BLANK() &&
+				                (CONTAINS(VIP, VIP[Sensitiv KLE], SUBSTITUTE('Revisionsdata'[klelvl3], ".", "")) ||
+				                CONTAINS(VIP, VIP[Sensitiv KLE], SUBSTITUTE('Revisionsdata'[klelvl2], ".", "")) ||
+				                CONTAINS(VIP, VIP[Sensitiv KLE], SUBSTITUTE('Revisionsdata'[klelvl1], ".", "")))
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "SENSITIV KLE",
+				            "Alarm beskrivelse", "KLE (1,2,3) matcher Sensitiv KLE i VIP"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[CprNummer] <> BLANK() &&
+				                CONTAINS(VIP, VIP[Cpr], 'Revisionsdata'[CprNummer])
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "SENSITIV CPR",
+				            "Alarm beskrivelse", "Partens CPR matcher Sensitiv CPR i VIP"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[CprNummer] <> BLANK() &&
+				                CONTAINS(VIP, VIP[Sensitiv CPR], 'Revisionsdata'[CprNummer])
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "SENSITIV CPR",
+				            "Alarm beskrivelse", "Partens CPR matcher Sensitiv CPR i VIP"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[CprNummer] <> BLANK() &&
+				                CONTAINS(VIP, VIP[Medarbejder CPR], 'Revisionsdata'[CprNummer])
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "MEDARBEJDER CPR",
+				            "Alarm beskrivelse", "Partens CPR matcher Medarbejder i VIP"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[PartBorger] <> BLANK() &&
+				                'Revisionsdata'[BrugerKunNavn] <> BLANK() &&
+				                LEFT(
+				                    'Revisionsdata'[PartBorger],
+				                    SEARCH(
+				                        " ",
+				                        'Revisionsdata'[PartBorger] & " "
+				                    ) - 1
+				                ) = LEFT(
+				                    'Revisionsdata'[BrugerKunNavn],
+				                    SEARCH(
+				                        " ",
+				                        'Revisionsdata'[BrugerKunNavn] & " "
+				                    ) - 1)
+				                ),
+				                "Log ID Temp", 'Revisionsdata'[Log ID],
+				                "Alarm", "MULIGT SELVOPSLAG (FORNAVN)",
+				                "Alarm beskrivelse", "Partens fornavn matcher Brugerens fornavn"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[PartBorger] <> BLANK() &&
+				                'Revisionsdata'[BrugerKunNavn] <> BLANK() &&
+				                'Revisionsdata'[PartBorger] = 'Revisionsdata'[BrugerKunNavn]
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "MULIGT SELVOPSLAG",
+				            "Alarm beskrivelse", "Partens navn matcher Brugerens navn"
+				        ),
+				        ADDCOLUMNS(
+				            FILTER(
+				                'Revisionsdata',
+				                'Revisionsdata'[PartBorger] <> BLANK() &&
+				                'Revisionsdata'[BrugerKunNavn] <> BLANK() &&
+				                'Revisionsdata'[PartBorger] IN VALUES('Revisionsdata'[BrugerKunNavn]) &&
+				                'Revisionsdata'[PartBorger] <> 'Revisionsdata'[BrugerKunNavn]
+				            ),
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "MULIGT OPSLAG PÅ KOLLEGA",
+				            "Alarm beskrivelse", "Partens navn matcher anden Brugers navn"
+				        ),
+				        ADDCOLUMNS(
+				            'Revisionsdata',
+				            "Log ID Temp", 'Revisionsdata'[Log ID],
+				            "Alarm", "",
+				            "Alarm beskrivelse", ""
+				        )
+				    ),
+				    "Log ID", [Log ID Temp],
+				    "Alarm", [Alarm],
+				    "Alarm beskrivelse", [Alarm beskrivelse]
+				)
+
+	annotation PBI_Id = 94106ee042f941449ddad5e68b46b6f7
+

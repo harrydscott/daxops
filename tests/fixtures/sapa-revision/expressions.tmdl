@@ -1,0 +1,49 @@
+expression Mappe = null meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=false]
+	lineageTag: 85559ccd-1c67-4e1c-8e85-04b41a03b5e4
+	queryGroup: Parameters
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+expression 'Søgekriterier (bruges ikke)' = ```
+		let
+		    // Reference the existing Revisionsdata table
+		    Source = Revisionsdata,
+		    
+		    // Keep only the "Log ID" and "Soegekriterier" columns
+		    KeepSelectedColumns = Table.SelectColumns(Source, {"Log ID", "Soegekriterier"}),
+		    
+		    // Replace null values in the 'Soegekriterier' column with empty strings
+		    ReplaceNullsInSoegekriterier = Table.ReplaceValue(KeepSelectedColumns, null, "", Replacer.ReplaceValue, {"Soegekriterier"}),
+		    
+		    // Split the 'Soegekriterier' column by commas
+		    SplitColumnByDelimiter = Table.TransformColumns(ReplaceNullsInSoegekriterier, {"Soegekriterier", each Text.Split(_, ",")}),
+		    
+		    // Extract headers and values from the split criteria
+		    ExtractHeadersAndValues = Table.TransformColumns(SplitColumnByDelimiter, {"Soegekriterier", each List.Transform(_, (item) => let parts = Text.Split(item, ":") in if List.Count(parts) = 2 then [Søgekriterie = Text.Trim(parts{0}), Søge værdi = if Text.Trim(parts{1}) = "null" then "" else Text.Trim(parts{1})] else null)}),
+		    
+		    // Remove null values
+		    RemoveNulls = Table.TransformColumns(ExtractHeadersAndValues, {"Soegekriterier", each List.RemoveNulls(_)}),
+		    
+		    // Convert the list of records to a table
+		    ExpandRecords = Table.ExpandListColumn(RemoveNulls, "Soegekriterier"),
+		    
+		    // Extract headers and values into separate columns
+		    ExtractColumns = Table.ExpandRecordColumn(ExpandRecords, "Soegekriterier", {"Søgekriterie", "Søge værdi"}),
+		    
+		    // Replace null values in the 'Søge værdi' column with empty strings
+		    ReplaceNullsInValues = Table.ReplaceValue(ExtractColumns, null, "", Replacer.ReplaceValue, {"Søge værdi"}),
+		    
+		    // Ensure all values are text
+		    EnsureTextValues = Table.TransformColumns(ReplaceNullsInValues, {"Søge værdi", each Text.From(_)})
+		in
+		    EnsureTextValues
+		```
+	lineageTag: 5f4ae087-cf54-4e56-b8ee-71587295c169
+	queryGroup: Tables
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

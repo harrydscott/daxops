@@ -1,0 +1,64 @@
+table GaugeTables
+	lineageTag: 18f23eb7-f708-4ddd-a88f-6e5c7a7eaf90
+	sourceLineageTag: d7fe9796-df04-4cf9-9f36-342facf1de74
+
+	measure 'Gauge Color' = EXTERNALMEASURE("Gauge Color", INTEGER, "DirectQuery to AS - Sales_incentives_part 1")
+		formatString: 0
+		lineageTag: c7c34627-5eb6-4cb6-917d-d9168a7874c6
+		sourceLineageTag: 98ca2958-7e5e-4f29-a5b8-a89e45697646
+		dataCategory: Uncategorized
+
+	column Metric
+		dataType: string
+		lineageTag: 637eae89-1cc8-4fdb-813f-c50ad0751e13
+		sourceLineageTag: 81715f03-80fc-4f6c-be66-dc09d2b1cf83
+		dataCategory: Uncategorized
+		summarizeBy: none
+		sourceColumn: Metric
+
+		annotation SummarizationSetBy = User
+
+	column MinValue
+		dataType: double
+		lineageTag: 427fb6f4-3efc-4e07-9648-93796293450f
+		sourceLineageTag: 12e422e9-3ea6-4482-983a-7fbf2486f864
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: MinValue
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TargetValue
+		dataType: double
+		lineageTag: 3e35e338-58cf-4784-9908-d998e4485176
+		sourceLineageTag: cb59b9aa-93ea-46dd-aec4-603e47d78152
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: TargetValue
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MaxValue
+		dataType: double
+		lineageTag: 056ee906-141b-45ab-bb0a-effda82bd7e9
+		sourceLineageTag: 427502c8-3b50-4bea-92b3-104d9425167f
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: MaxValue
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition GaugeTables = entity
+		mode: directQuery
+		source
+			entityName: GaugeTable
+			expressionSource: 'DirectQuery to AS - Sales_incentives_part 1'
+
+	changedProperty = Name
+

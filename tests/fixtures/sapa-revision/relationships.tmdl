@@ -1,0 +1,40 @@
+relationship 62fca89b-96ca-4c83-a02c-c4aafd72040b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Revisionsdata.Tidspunkt
+	toColumn: LocalDateTable_ff9e27ff-223a-47cf-a30f-a9497261a88b.Date
+
+relationship 40b9c1f3-b7c2-41f2-ab72-a8178e55e2b2
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Revisionsdata.Dato
+	toColumn: LocalDateTable_9b7fa60f-2b46-418a-b715-1d097e0bb674.Date
+
+relationship 14082f9e-4a75-d6b3-5a0a-089ab13612a1
+	toCardinality: many
+	fromColumn: Revisionsdata.Time
+	toColumn: Dagstimer.Time
+
+relationship 0762c170-35f6-5e99-ed2d-4bbbdaece9df
+	fromColumn: Overvågninger.'Log ID'
+	toColumn: Revisionsdata.'Log ID'
+
+relationship e4bf5672-b478-c1d5-09fb-62b8874f44ba
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: Søgekriterier.'Log ID'
+	toColumn: Revisionsdata.'Log ID'
+
+relationship fa233da1-9744-af5d-4c99-d591e152ba1b
+	fromColumn: Revisionsdata.Beskrivelse+FormålType
+	toColumn: Formål.Beskrivelse+ID
+
+relationship 2c80e778-96a2-9340-57c7-041343f63e37
+	crossFilteringBehavior: bothDirections
+	toCardinality: many
+	fromColumn: Faneblad.Komponent+Note
+	toColumn: Revisionsdata.Komponent+Note
+
+relationship 0c43ae18-7b3f-c5e1-2bde-b19d229d5893
+	toCardinality: many
+	fromColumn: Alarmer.'Log ID'
+	toColumn: Revisionsdata.'Log ID'
+

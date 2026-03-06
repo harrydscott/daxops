@@ -1,0 +1,272 @@
+table Revisionslog
+	lineageTag: 3abff189-264b-4a23-98cc-9450147aba83
+
+	column Column1
+		dataType: string
+		lineageTag: 1badcc38-01d2-4a24-91aa-da7f4fcc71a3
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column2
+		dataType: string
+		lineageTag: 10e49369-abb0-4021-8c77-5b2ab24d5e65
+		summarizeBy: none
+		sourceColumn: Column2
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column3
+		dataType: string
+		lineageTag: 384ff556-912b-4c1f-999b-24b043ba8cf4
+		summarizeBy: none
+		sourceColumn: Column3
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column4
+		dataType: string
+		lineageTag: d784c715-76ff-4b9f-b26f-3efa39982429
+		summarizeBy: none
+		sourceColumn: Column4
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column5
+		dataType: string
+		lineageTag: 0a376e21-2538-4ef8-a0d8-9a6f2ab6d300
+		summarizeBy: none
+		sourceColumn: Column5
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column6
+		dataType: string
+		lineageTag: 9bff537a-41c5-487a-81e7-2f135b3805a2
+		summarizeBy: none
+		sourceColumn: Column6
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column7
+		dataType: string
+		lineageTag: 3c69f7a7-6297-4f7b-8f22-deb4660d254f
+		summarizeBy: none
+		sourceColumn: Column7
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column8
+		dataType: string
+		lineageTag: b93413a2-c8db-488f-ad5a-44dfdde955d8
+		summarizeBy: none
+		sourceColumn: Column8
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column9
+		dataType: string
+		lineageTag: dd93697e-3f2a-46e8-98d8-8515f867acda
+		summarizeBy: none
+		sourceColumn: Column9
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column10
+		dataType: string
+		lineageTag: 950880b3-db64-4a8c-b1b9-c7dd31469f6c
+		summarizeBy: none
+		sourceColumn: Column10
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column11
+		dataType: string
+		lineageTag: ffd9d645-0ccb-4588-812f-61be4274eb6b
+		summarizeBy: none
+		sourceColumn: Column11
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column12
+		dataType: string
+		lineageTag: 9f873daa-d581-444f-b458-e283a4cad388
+		summarizeBy: none
+		sourceColumn: Column12
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column13
+		dataType: string
+		lineageTag: 7ff5520a-6931-434d-9607-6a2343eb5248
+		summarizeBy: none
+		sourceColumn: Column13
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column14
+		dataType: string
+		lineageTag: c12f3c6b-cb3e-428c-9425-7e582bbe389c
+		summarizeBy: none
+		sourceColumn: Column14
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column15
+		dataType: string
+		lineageTag: cd9a83cd-8d24-4a78-b2d8-9f33c1f72208
+		summarizeBy: none
+		sourceColumn: Column15
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column16
+		dataType: string
+		lineageTag: 6b377f7a-eda0-42f0-8663-8e9d1f103ef2
+		summarizeBy: none
+		sourceColumn: Column16
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column17
+		dataType: string
+		lineageTag: c7a4c981-0a0b-4c3f-9b5d-7d8db959f4af
+		summarizeBy: none
+		sourceColumn: Column17
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column18
+		dataType: string
+		lineageTag: d75c24ae-51b8-4735-8c6c-e1924dd80b06
+		summarizeBy: none
+		sourceColumn: Column18
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column19
+		dataType: string
+		lineageTag: d3625b84-a8e4-4719-97dd-415724cfb374
+		summarizeBy: none
+		sourceColumn: Column19
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column20
+		dataType: string
+		lineageTag: 8ccd745c-d978-4469-95cf-8a12c67cb141
+		summarizeBy: none
+		sourceColumn: Column20
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column21
+		dataType: string
+		lineageTag: b5f7f400-2c15-49e8-8543-2c332230e50d
+		summarizeBy: none
+		sourceColumn: Column21
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column22
+		dataType: string
+		lineageTag: cd4c4abf-f3f6-4c53-8b6d-ba0e841cf4cf
+		summarizeBy: none
+		sourceColumn: Column22
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column23
+		dataType: string
+		lineageTag: fd3cbade-809b-4177-8ef5-eb2eb437c5e5
+		summarizeBy: none
+		sourceColumn: Column23
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column24
+		dataType: string
+		lineageTag: 680240c8-73ba-4e39-bd6a-a58effe016cb
+		summarizeBy: none
+		sourceColumn: Column24
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column25
+		dataType: string
+		lineageTag: 23c3d58e-282e-480b-9bc2-cf2ff384d340
+		summarizeBy: none
+		sourceColumn: Column25
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column26
+		dataType: string
+		lineageTag: bbf1f806-f993-40f3-b741-6c70c5c8d448
+		summarizeBy: none
+		sourceColumn: Column26
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column27
+		dataType: string
+		lineageTag: d824e158-3013-4eb4-949a-91b19b952f49
+		summarizeBy: none
+		sourceColumn: Column27
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column28
+		dataType: string
+		lineageTag: 0d4322e6-b569-4014-b873-b2c568fb231c
+		summarizeBy: none
+		sourceColumn: Column28
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column29
+		dataType: string
+		lineageTag: 4e361f21-8511-4b5c-8ae2-45ec642feb7d
+		summarizeBy: none
+		sourceColumn: Column29
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column30
+		dataType: string
+		lineageTag: 5f8ad89e-8b10-400c-98e2-a701cdaadf48
+		summarizeBy: none
+		sourceColumn: Column30
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column31
+		dataType: string
+		lineageTag: cbda3398-3a73-4947-a42c-bb11f321e99d
+		summarizeBy: none
+		sourceColumn: Column31
+
+		annotation SummarizationSetBy = Automatic
+
+	column Column32
+		dataType: string
+		lineageTag: 6d055789-72e3-4002-be96-d3069461f8ee
+		summarizeBy: none
+		sourceColumn: Column32
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Revisionslog = m
+		mode: import
+		queryGroup: Sources
+		source =
+				let
+				    Log = Csv.Document(File.Contents("C:\Users\TWL\OneDrive - KOMBIT A S\Dokumenter - SAPA-rapportering\Studentermappe\Benchmarking og revision\Rapport\Logs\SOP Revisionslog 11-08-2025 15_07_26.csv"),[Delimiter=";"])
+				in
+				    Log
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

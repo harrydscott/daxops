@@ -1,0 +1,56 @@
+table Søgekriterier
+	lineageTag: b17b1dac-fec5-45a8-a0f9-6373e2ef0812
+
+	column 'Log ID'
+		lineageTag: f17d974d-2585-473d-9a1b-cb3ff451351d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Log ID]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Søgekriterie
+		lineageTag: 35b7361b-8042-47c6-8495-141047d197fc
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Søgekriterie]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Søge værdi'
+		lineageTag: e45f44d6-4cc0-494a-bd5a-347ec1d52529
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Søge værdi]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Søgekriterier = calculated
+		mode: import
+		source = ```
+				
+				    SELECTCOLUMNS(
+				        ADDCOLUMNS(
+				            GENERATE(
+				                SELECTCOLUMNS(Revisionsdata, "Temp Log ID", Revisionsdata[Log ID], "Soegekriterier", Revisionsdata[Soegekriterier]),
+				                VAR SoegekriterierList = 
+				                    SELECTCOLUMNS(
+				                        ADDCOLUMNS(
+				                            GENERATESERIES(1, PATHLENGTH(SUBSTITUTE([Soegekriterier], ", ", "|"))),
+				                            "Item", PATHITEM(SUBSTITUTE([Soegekriterier], ", ", "|"), [Value])
+				                        ),
+				                        "Søgekriterie", IF(CONTAINSSTRING([Item], ": "), LEFT([Item], FIND(": ", [Item]) - 1), BLANK()),
+				                        "Søge værdi", IF(CONTAINSSTRING([Item], ": "), SUBSTITUTE(MID([Item], FIND(": ", [Item]) + 2, LEN([Item]) - FIND(": ", [Item]) - 1), "null", ""), BLANK())
+				                    )
+				                RETURN FILTER(SoegekriterierList, NOT ISBLANK([Søgekriterie]))
+				            ),
+				            "Log ID", [Temp Log ID]
+				        ),
+				        "Log ID", [Log ID],
+				        "Søgekriterie", [Søgekriterie],
+				        "Søge værdi", [Søge værdi]
+				    )
+				```
+
+	annotation PBI_Id = 7797170de9094aada10919750202455d
+

@@ -133,11 +133,14 @@ def _parse_table_file(path: Path) -> Table | None:
     partition_source_lines: list[str] = []
     in_measure_continuation = False
     measure_expr_lines: list[str] = []
+    in_backtick_block = False  # for ``` delimited expressions
+    in_extended_property = False  # for extendedProperty blocks
 
     def _flush():
         nonlocal current_column, current_measure, current_partition
         nonlocal in_partition_source, partition_source_lines
         nonlocal in_measure_continuation, measure_expr_lines
+        nonlocal in_backtick_block, in_extended_property
         if current_column:
             table.columns.append(current_column)
             current_column = None
@@ -160,9 +163,32 @@ def _parse_table_file(path: Path) -> Table | None:
             current_partition = None
         in_partition_source = False
         in_measure_continuation = False
+        in_backtick_block = False
+        in_extended_property = False
 
     for line in lines:
         stripped = line.strip()
+
+        # Backtick-delimited expression block
+        if in_backtick_block:
+            if stripped.startswith("```") or stripped.endswith("```"):
+                # End of backtick block — extract any content before the closing ```
+                content = stripped.replace("```", "").strip()
+                if content:
+                    measure_expr_lines.append(content)
+                in_backtick_block = False
+            else:
+                measure_expr_lines.append(stripped)
+            continue
+
+        # Extended property / annotation block (JSON or multi-line value — skip)
+        if in_extended_property:
+            # End when we hit a line at the same or lower indent level that is a property
+            if _is_known_property(stripped) or re.match(r"^\s*(measure|column|partition|hierarchy|table)\s+", line):
+                in_extended_property = False
+                # Fall through to normal parsing
+            else:
+                continue
 
         # Description comments (/// above an object)
         if stripped.startswith("///"):
@@ -183,18 +209,27 @@ def _parse_table_file(path: Path) -> Table | None:
             table.lineage_tag = stripped.split(":", 1)[1].strip()
             continue
 
-        # Measure: 'Name' = expression (expression may be empty for multi-line)
+        # Measure: 'Name' = expression OR measure Name = expression (unquoted)
         m = re.match(r"^\s*measure\s+'([^']+)'\s*=\s*(.*)?$", stripped)
+        if not m:
+            m = re.match(r"^\s*measure\s+(\S+)\s*=\s*(.*)?$", stripped)
         if m:
             _flush()
             current_obj = "measure"
             expr = (m.group(2) or "").strip()
-            current_measure = Measure(name=m.group(1), expression=expr)
+            # Handle backtick-delimited expressions
+            if expr.startswith("```"):
+                expr = expr[3:].strip()
+                if expr.endswith("```"):
+                    expr = expr[:-3].strip()
+                else:
+                    in_backtick_block = True
+            current_measure = Measure(name=_unquote(m.group(1)), expression=expr)
             if pending_desc:
                 current_measure.description = " ".join(pending_desc)
                 pending_desc = []
             # If the expression is empty or doesn't look complete, prepare for continuation
-            if not expr:
+            if not expr and not in_backtick_block:
                 in_measure_continuation = True
             continue
 
@@ -269,8 +304,10 @@ def _parse_table_file(path: Path) -> Table | None:
             elif current_measure:
                 in_measure_continuation = False
                 current_measure.format_string = val
-        elif stripped == "isHidden" and current_column:
-            current_column.is_hidden = True
+        elif stripped == "isHidden":
+            if current_column:
+                current_column.is_hidden = True
+            # Measures can also be hidden (we don't track it but must not break parsing)
         elif stripped.startswith("summarizeBy:") and current_column:
             current_column.summarize_by = stripped.split(":", 1)[1].strip()
         elif stripped.startswith("lineageTag:"):
@@ -295,6 +332,16 @@ def _parse_table_file(path: Path) -> Table | None:
             in_partition_source = True
         elif in_partition_source and current_partition:
             partition_source_lines.append(line)
+        elif stripped.startswith("extendedProperty ") or stripped.startswith("annotation "):
+            # Skip extended property / annotation blocks (may be multi-line JSON)
+            if "=" in stripped and not stripped.rstrip().endswith("="):
+                pass  # single-line annotation, skip
+            elif "=" in stripped:
+                in_extended_property = True  # multi-line block, skip until next property
+        elif stripped.startswith("changedProperty ") or stripped.startswith("excludeFromModelRefresh"):
+            pass  # single-line properties, skip
+        elif stripped.startswith("sourceColumn:"):
+            pass  # skip sourceColumn
 
         # Clear pending desc if we hit a non-desc, non-object line
         if not stripped.startswith("///"):
@@ -309,6 +356,11 @@ def _is_known_property(stripped: str) -> bool:
     props = [
         "formatString:", "displayFolder:", "lineageTag:", "dataType:",
         "summarizeBy:", "isHidden", "mode:", "source", "description:",
+        "annotation ", "extendedProperty ", "changedProperty ",
+        "sourceColumn:", "sortByColumn:", "isDataTypeInferred",
+        "isNameInferred", "isAvailableInMDX", "excludeFromModelRefresh",
+        "isDefaultLabel", "isDefaultImage", "isKey", "isNullable",
+        "isPrivate", "isUnique",
     ]
     return any(stripped.startswith(p) for p in props)
 

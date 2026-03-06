@@ -1,0 +1,99 @@
+table Formål
+	lineageTag: a4f7d7ed-d459-4547-ac67-269a4023b36b
+
+	column Beskrivelse
+		lineageTag: 6f023caf-1d05-4dce-a296-0151ed8dde5d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Beskrivelse]
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID
+		lineageTag: 5818be62-6624-4743-a5ef-e04ca1878660
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ID]
+
+		annotation SummarizationSetBy = User
+
+	column Navn
+		lineageTag: d6efd815-9ba4-443b-8de0-d0bc2cc98fcd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Navn]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Beskrivelse+ID = [Beskrivelse] & [ID]
+		lineageTag: 18ef2892-c0d8-4598-8c37-88161e0bc271
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Formål = calculated
+		mode: import
+		source = ```
+				
+				DATATABLE(
+				    "Beskrivelse", STRING,
+				    "ID", STRING,
+				    "Navn", STRING,
+				    {
+				        {"Visning IndkomstOplysninger", "Formaal171", "Kontrol af bevillinger efter LAB"},
+				        {"Visning IndkomstOplysninger", "Formaal172", "Kontrol af bevillinger efter LAS m.fl."},
+				        {"Visning IndkomstOplysninger", "171", "Kontrol af bevillinger efter LAB"},
+				        {"Visning IndkomstOplysninger", "172", "Kontrol af bevillinger efter LAS m.fl."},
+				        {"Visning IndkomstOplysninger", "233", "Opkrævning"},
+				        {"Visning IndkomstOplysninger", "223", "Mellemkommunal refusion"},
+				        {"Visning IndkomstOplysninger", "272", "Bred dataadgang"},
+				        {"Visning IndkomstOplysninger", "280", "Mellem dataadgang"},
+				        {"Visning IndkomstOplysninger", "286", "Snæver dataadgang"},
+				
+				        {"Modal Åbnet IndkomstOplysningerSammentaelling", "171", "Kontrol af bevillinger efter LAB"},
+				        {"Modal Åbnet IndkomstOplysningerSammentaelling", "172", "Kontrol af bevillinger efter LAS m.fl."},
+				        
+				        {"Visning Aarsopgoerelse", "1", "Dagtilbud"},
+				        {"Visning Aarsopgoerelse", "2", "Sygedagpenge"},
+				        {"Visning Aarsopgoerelse", "3", "UDK Fleksydelse"},
+				        {"Visning Aarsopgoerelse", "4", "UDK Delpension"},
+				        {"Visning Aarsopgoerelse", "5", "UDK Tidlig Pension"},
+				        {"Visning Aarsopgoerelse", "6", "UDK Seniorpræmie"},
+				        {"Visning Aarsopgoerelse", "7", "UDK Pension"},
+				        {"Visning Aarsopgoerelse", "8", "UDK Familieydelser"},
+				        {"Visning Aarsopgoerelse", "9", "UDK Boligstøtte"},
+				        {"Visning Aarsopgoerelse", "10", "UDK Barselsdagpenge"},
+				        {"Visning Aarsopgoerelse", "11", "Bred dataadgang - Årsopgørelse"},
+				
+				        {"Visning Forskudsopgoerelse", "1", "Sygedagpenge"},
+				        {"Visning Forskudsopgoerelse", "2", "UDK Pension"},
+				        {"Visning Forskudsopgoerelse", "3", "UDK Familieydelser"},
+				        {"Visning Forskudsopgoerelse", "4", "Bred dataadgang – Forskudsopgørelse"},
+				
+				        {"Visning PersonKontrolOplysninger", "1", "Kontrol af udbetaling af ydelser"},
+				        {"Visning PersonKontrolOplysninger", "2", "UDK Delpension"},
+				        {"Visning PersonKontrolOplysninger", "3", "UDK Efterlevelseshjælp"},
+				        {"Visning PersonKontrolOplysninger", "4", "UDK Begravelseshjælp "},
+				        {"Visning PersonKontrolOplysninger", "5", "UDK Seniorpræmie"},
+				        {"Visning PersonKontrolOplysninger", "6", "UDK Tidlig Pension"},
+				        {"Visning PersonKontrolOplysninger", "7", "UDK Pension"},
+				        {"Visning PersonKontrolOplysninger", "8", "UDK Familieydelser"},
+				        {"Visning PersonKontrolOplysninger", "9", "UDK Fleksydelse"},
+				        {"Visning PersonKontrolOplysninger", "10", "UDK Helhedsorienteret Kontrol"},
+				        {"Visning PersonKontrolOplysninger", "11", "UDK Den Fælles Dataenhed Udland"},
+				        {"Visning PersonKontrolOplysninger", "12", "UDK Boligstøtte"},
+				
+				        {"Visning VirksomhedsKontrolOplysninger", "1", "Kontrol af udbetaling af ydelser"},
+				
+				        {"Visning DigitalLogbog", "1", "Udstilling af digital logbog"},
+				
+				        {"Visning SelvstaendigVirksomhed", "1", ""},
+				
+				        {"Visning Pensionsrettigheder", "1", "UDK Fleksydelse"},
+				        {"Visning Pensionsrettigheder", "2", "UDK Tidlig Pension"}
+				    }
+				)
+				```
+
+	annotation PBI_Id = 9098ddf5bb1e4c4395c164fcba9282f5
+

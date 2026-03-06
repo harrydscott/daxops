@@ -1,0 +1,67 @@
+table VIP
+	lineageTag: 384c68af-22cd-4b9b-9a8d-cc56648d39ae
+
+	column Cpr
+		dataType: string
+		lineageTag: dbe93da1-4f2d-4894-8b0f-585edac86f48
+		summarizeBy: none
+		sourceColumn: Cpr
+
+		annotation SummarizationSetBy = Automatic
+
+	column KLE
+		dataType: string
+		lineageTag: 9fabb557-f4eb-4c98-9323-82d5a74f6c63
+		summarizeBy: none
+		sourceColumn: KLE
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Medarbejder CPR'
+		dataType: string
+		lineageTag: 6f71097c-bdfa-42a4-a437-b22b9f7ce318
+		summarizeBy: none
+		sourceColumn: Medarbejder CPR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sensitiv CPR'
+		dataType: string
+		lineageTag: a0681972-9f47-45ad-b14d-b16f928d0cc5
+		summarizeBy: none
+		sourceColumn: Sensitiv CPR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sensitiv KLE'
+		dataType: string
+		lineageTag: 790b67ea-9b5a-426a-aeeb-c5e783a6d892
+		summarizeBy: none
+		sourceColumn: Sensitiv KLE
+
+		annotation SummarizationSetBy = Automatic
+
+	partition VIP = m
+		mode: import
+		queryGroup: Sources
+		source = ```
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\TWL\OneDrive - KOMBIT A S\Dokumenter - SAPA-rapportering\Studentermappe\Benchmarking og revision\Rapport\2.0\VIP.xlsx"), null, true),
+				    Tabel1_Table = Source{[Item="Tabel1",Kind="Table"]}[Data],
+				
+				    ColumnsToCheck = {"Cpr", "KLE", "Sensitiv CPR", "Sensitiv KLE", "Medarbejder CPR"},
+				    AddMissingColumns = List.Accumulate(ColumnsToCheck, Tabel1_Table, (state, current) => 
+				        if List.Contains(Table.ColumnNames(state), current) then state 
+				        else Table.AddColumn(state, current, each null)
+				    ),
+				    #"Ændret type" = Table.TransformColumnTypes(AddMissingColumns,{{"Cpr", type any}, {"KLE", type text}, {"Sensitiv CPR", type any},  {"Sensitiv KLE", type text}, {"Medarbejder CPR", type text}}),
+				    
+				    RemoveDotsAndHyphens = Table.TransformColumns(#"Ændret type", List.Transform(Table.ColumnNames(#"Ændret type"), each {_, each Text.Remove(Text.From(_), {".", "-"})}))
+				in
+				    RemoveDotsAndHyphens
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,11 @@
+expression 'DirectQuery to AS - Sales_incentives_part 1' =
+		let
+		    Source = AnalysisServices.Database("powerbi://api.powerbi.com/v1.0/bf2665d9-7e6b-49ab-93a5-4b7262a44452/CNH%20Dashboard", "Sales_incentives_part 1"),
+		    Cubes = Table.Combine(Source[Data]),
+		    Cube = Cubes{[Id="Model", Kind="Cube"]}[Data]
+		in
+		    Cube
+	lineageTag: 8f5c885c-f7e5-49b9-9c9a-63dad45bd3af
+
+	annotation PBI_IncludeFutureArtifacts = True
+

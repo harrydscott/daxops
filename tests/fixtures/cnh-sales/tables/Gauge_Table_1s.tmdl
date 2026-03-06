@@ -1,0 +1,59 @@
+table Gauge_Table_1s
+	lineageTag: dbe6fd2d-b15d-42d3-a2f6-a8fde40aa79a
+	sourceLineageTag: fb8aa1d0-d4c4-438b-8526-54f67744ab88
+
+	column Min
+		dataType: double
+		formatString: 0
+		lineageTag: a4d6f10c-dcdb-436d-b5f2-73cfd4aae0db
+		sourceLineageTag: da123d70-b5a8-4f4c-8e17-74f65a3a0592
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Min
+
+		annotation SummarizationSetBy = User
+
+	column Max
+		dataType: double
+		lineageTag: 3b2dc5d3-5445-4512-b626-a5e5744e781f
+		sourceLineageTag: d235fbe0-235e-4917-b5cf-5c5b09247a99
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Max
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Target Value'
+		dataType: double
+		lineageTag: 6d84a788-d13e-432a-a776-9c381ad6ec27
+		sourceLineageTag: f847c57a-0e7a-4982-8d60-832a0fca098f
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Target Value
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Total Achievement'
+		dataType: double
+		lineageTag: 2b210d47-9f9f-4591-933a-4952752084a3
+		sourceLineageTag: 2fb5c32f-f541-402f-94da-8b9a0825911f
+		dataCategory: Uncategorized
+		summarizeBy: sum
+		sourceColumn: Total Achievement
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Gauge_Table_1s = entity
+		mode: directQuery
+		source
+			entityName: Gauge_Table_1
+			expressionSource: 'DirectQuery to AS - Sales_incentives_part 1'
+
+	changedProperty = Name
+

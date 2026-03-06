@@ -1,0 +1,43 @@
+table Overvågning
+	lineageTag: cbdaddd3-6279-4dd5-907c-b583d6525a3e
+
+	column 'Sensitiv Navn'
+		dataType: string
+		lineageTag: f6394c5b-af4e-48dc-8bdc-19654e66cac7
+		summarizeBy: none
+		sourceColumn: Sensitiv Navn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sensitiv Adresse'
+		dataType: string
+		lineageTag: 6a88c5d1-9205-4f31-9f6b-cf30571ab8f7
+		summarizeBy: none
+		sourceColumn: Sensitiv Adresse
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Overvågning = m
+		mode: import
+		queryGroup: Sources
+		source = ```
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\TWL\OneDrive - KOMBIT A S\Dokumenter - SAPA-rapportering\Studentermappe\Benchmarking og revision\Rapport\2.0\Overvågning.xlsx"), null, true),
+				    Tabel1_Table = Source{[Item="Tabel1",Kind="Table"]}[Data],
+				
+				    ColumnsToCheck = {"Sensitiv Navn", "Sensitiv Adresse"},
+				    AddMissingColumns = List.Accumulate(ColumnsToCheck, Tabel1_Table, (state, current) => 
+				        if List.Contains(Table.ColumnNames(state), current) then state 
+				        else Table.AddColumn(state, current, each null)
+				    ),
+				    #"Ændret type" = Table.TransformColumnTypes(AddMissingColumns,{{"Sensitiv Navn", type text}, {"Sensitiv Adresse", type text}}),
+				    
+				    RemoveDotsAndHyphens = Table.TransformColumns(#"Ændret type", List.Transform(Table.ColumnNames(#"Ændret type"), each {_, each Text.Remove(Text.From(_), {".", "-"})}))
+				in
+				    RemoveDotsAndHyphens
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
