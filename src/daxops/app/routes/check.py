@@ -46,8 +46,8 @@ def get_check(
     search: str | None = Query(None, description="Free-text search in message/object"),
 ) -> CheckResponse:
     """Return health check findings with optional filters."""
-    if not app_state.model_path:
-        raise HTTPException(status_code=400, detail="No model path configured")
+    if app_state.connection_mode == "none":
+        raise HTTPException(status_code=400, detail="No model path or SSAS connection configured")
     model = app_state.ensure_model()
     config = app_state.config
 

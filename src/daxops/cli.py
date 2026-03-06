@@ -911,13 +911,19 @@ def compare(before_path: str, after_path: str, fmt: str):
 @cli.command()
 @click.option("--port", type=int, default=8765, help="Port to serve on")
 @click.option("--model-path", type=click.Path(exists=True), default=None, help="TMDL model folder to open")
+@click.option("--ssas-server", default=None, help="SSAS server address (e.g. localhost:12345)")
+@click.option("--database", default=None, help="SSAS database/catalog name")
 @click.option("--no-browser", is_flag=True, help="Don't open browser automatically")
-def app(port: int, model_path: str | None, no_browser: bool):
+def app(port: int, model_path: str | None, ssas_server: str | None, database: str | None, no_browser: bool):
     """Launch the DaxOps web app in your browser."""
     import uvicorn
     from daxops.app.main import create_app
 
-    application = create_app(model_path=model_path)
+    application = create_app(
+        model_path=model_path,
+        ssas_server=ssas_server,
+        ssas_database=database,
+    )
 
     if not no_browser:
         import threading
@@ -926,8 +932,17 @@ def app(port: int, model_path: str | None, no_browser: bool):
         threading.Timer(1.0, webbrowser.open, args=[url]).start()
 
     console.print(f"[bold]DaxOps[/bold] web app starting on [link=http://localhost:{port}]http://localhost:{port}[/link]")
+    if ssas_server:
+        console.print(f"  SSAS: {ssas_server} / {database}")
     if model_path:
         console.print(f"  Model: {model_path}")
+    if ssas_server and not model_path:
+        from daxops.app.state import app_state
+        if app_state.model_path:
+            console.print(f"  TMDL (auto-detected): {app_state.model_path}")
+        else:
+            console.print("  [yellow]TMDL folder not detected — fix/write operations unavailable.[/yellow]")
+            console.print("  [dim]Use --model-path or set it in Settings.[/dim]")
     console.print("  Press Ctrl+C to stop.\n")
 
     uvicorn.run(application, host="127.0.0.1", port=port, log_level="warning")

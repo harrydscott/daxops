@@ -35,8 +35,8 @@ class InfoResponse(BaseModel):
 @router.get("/info", response_model=InfoResponse)
 def get_info() -> InfoResponse:
     """Return model statistics."""
-    if not app_state.model_path:
-        raise HTTPException(status_code=400, detail="No model path configured")
+    if app_state.connection_mode == "none":
+        raise HTTPException(status_code=400, detail="No model path or SSAS connection configured")
     model = app_state.ensure_model()
     return InfoResponse(
         name=model.name,

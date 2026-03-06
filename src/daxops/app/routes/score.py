@@ -37,8 +37,8 @@ class ScoreResponse(BaseModel):
 @router.get("/score", response_model=ScoreResponse)
 def get_score() -> ScoreResponse:
     """Return full scoring result."""
-    if not app_state.model_path:
-        raise HTTPException(status_code=400, detail="No model path configured")
+    if app_state.connection_mode == "none":
+        raise HTTPException(status_code=400, detail="No model path or SSAS connection configured")
     model = app_state.ensure_model()
     config = app_state.config
 
