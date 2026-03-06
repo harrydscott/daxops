@@ -1,0 +1,110 @@
+{
+  "name": "daxops",
+  "displayName": "DaxOps",
+  "description": "Semantic model lifecycle tool for Power BI / Microsoft Fabric — score, check, and fix TMDL models.",
+  "version": "0.1.0",
+  "publisher": "daxops",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/daxops"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "power-bi",
+    "tmdl",
+    "dax",
+    "semantic-model",
+    "fabric"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/model.tmdl",
+    "workspaceContains:**/*.pbip"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "daxops.score",
+        "title": "DaxOps: Score Model"
+      },
+      {
+        "command": "daxops.check",
+        "title": "DaxOps: Check Model"
+      },
+      {
+        "command": "daxops.fix",
+        "title": "DaxOps: Fix Model"
+      },
+      {
+        "command": "daxops.fixDryRun",
+        "title": "DaxOps: Fix Model (Dry Run)"
+      },
+      {
+        "command": "daxops.report",
+        "title": "DaxOps: Generate Report"
+      },
+      {
+        "command": "daxops.watch",
+        "title": "DaxOps: Watch Mode"
+      },
+      {
+        "command": "daxops.badge",
+        "title": "DaxOps: Generate Badge"
+      },
+      {
+        "command": "daxops.baseline",
+        "title": "DaxOps: Save Baseline"
+      }
+    ],
+    "configuration": {
+      "title": "DaxOps",
+      "properties": {
+        "daxops.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Path to Python executable with daxops installed."
+        },
+        "daxops.modelPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to TMDL model directory. If empty, auto-detects from workspace."
+        },
+        "daxops.runOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically run health checks when TMDL files are saved."
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "tmdl",
+        "extensions": [
+          ".tmdl"
+        ],
+        "aliases": [
+          "TMDL",
+          "Tabular Model Definition Language"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}
