@@ -23,13 +23,15 @@ dependencies = [
     "rich>=13.0",
     "jinja2>=3.0",
     "pyyaml>=6.0",
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
 ]
 
 [project.optional-dependencies]
 llm = ["openai>=1.0"]
 xmla = ["pyadomd>=0.1.0", "azure-identity>=1.14"]
 fabric = ["semantic-link-sempy>=0.7.0"]
-dev = ["pytest>=7.0", "pytest-cov"]
+dev = ["pytest>=7.0", "pytest-cov", "httpx>=0.25"]
 
 [project.scripts]
 daxops = "daxops.cli:cli"

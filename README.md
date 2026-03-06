@@ -81,9 +81,39 @@ daxops info ./my-model/ --format json
 daxops scan "My Workspace" "My Dataset"
 daxops scan "My Workspace" "My Dataset" --output model.json
 
+# Launch the interactive web app
+daxops app --model-path ./my-model/
+daxops app                             # opens folder picker in browser
+
 # Create a sample model to try it out
 daxops init ./sample/
 ```
+
+## Interactive Web App
+
+Launch a browser-based dashboard to explore your model's health and scores:
+
+```bash
+# Open with a specific model
+daxops app --model-path ./my-model/
+
+# Launch without a model (select folder in browser)
+daxops app
+
+# Custom port
+daxops app --port 9000 --model-path ./my-model/
+
+# Don't auto-open browser
+daxops app --no-browser --model-path ./my-model/
+```
+
+The web app provides:
+- **Dashboard** — score tiles (Bronze/Silver/Gold), finding summary, model stats
+- **Findings List** — filterable by severity, rule, table, and free-text search
+- **Settings** — browse filesystem and select a TMDL folder or .pbip project
+- **Re-scan** — refresh model data without restarting the server
+
+No build step required. The frontend uses Alpine.js and is served directly by FastAPI.
 
 ## PBIP Project Support
 

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaxOps</title>
+    <link rel="stylesheet" href="/style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+<div id="app" x-data="daxops()" x-init="init()">
+
+    <!-- Header -->
+    <header class="app-header">
+        <h1>DaxOps</h1>
+        <nav>
+            <button :class="{ active: screen === 'dashboard' }" @click="screen = 'dashboard'">Dashboard</button>
+            <button :class="{ active: screen === 'findings' }" @click="screen = 'findings'">Findings</button>
+            <button :class="{ active: screen === 'settings' }" @click="openSettings()">Settings</button>
+        </nav>
+        <div class="header-right">
+            <template x-if="modelPath">
+                <span x-text="modelPath" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+            </template>
+            <template x-if="modelLoaded">
+                <button class="btn" @click="rescan()" :disabled="loading">
+                    <span x-show="loading" class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></span>
+                    Re-scan
+                </button>
+            </template>
+        </div>
+    </header>
+
+    <main class="main">
+
+        <!-- Error bar -->
+        <template x-if="error">
+            <div class="status-bar error">
+                <span x-text="error"></span>
+                <button class="btn" @click="error = null" style="margin-left:auto; padding:4px 8px;">Dismiss</button>
+            </div>
+        </template>
+
+        <!-- Loading -->
+        <template x-if="loading && !modelLoaded">
+            <div class="loading"><span class="spinner"></span> Scanning model...</div>
+        </template>
+
+        <!-- No model selected -->
+        <template x-if="!modelPath && !loading">
+            <div class="empty-state">
+                <div class="icon">&#128194;</div>
+                <p>No model loaded. Open Settings to select a TMDL folder.</p>
+                <button class="btn btn-primary" style="margin-top: 16px;" @click="openSettings()">Select Model Folder</button>
+            </div>
+        </template>
+
+        <!-- ===== DASHBOARD ===== -->
+        <section x-show="screen === 'dashboard' && modelLoaded && !loading">
+
+            <!-- Model info bar -->
+            <template x-if="info">
+                <div class="status-bar">
+                    <strong x-text="info.name"></strong>
+                    <span>&mdash;</span>
+                    <span x-text="info.tables + ' tables'"></span>
+                    <span>&middot;</span>
+                    <span x-text="info.measures + ' measures'"></span>
+                    <span>&middot;</span>
+                    <span x-text="info.columns + ' columns'"></span>
+                    <span>&middot;</span>
+                    <span x-text="info.relationships + ' relationships'"></span>
+                </div>
+            </template>
+
+            <!-- Score tiles -->
+            <template x-if="scoreData">
+                <div>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <span class="tier-badge" :class="'tier-' + tier" x-text="tierLabel + ' Tier'"></span>
+                    </div>
+                    <div class="grid grid-3">
+                        <div class="card score-tile">
+                            <div class="card-title">Bronze</div>
+                            <div class="score-value" :class="scoreData.summary.bronze_pass ? 'score-pass' : 'score-fail'"
+                                 x-text="scoreData.summary.bronze_score"></div>
+                            <div class="score-label">
+                                min <span x-text="scoreData.summary.thresholds.bronze_min"></span>
+                            </div>
+                        </div>
+                        <div class="card score-tile">
+                            <div class="card-title">Silver</div>
+                            <div class="score-value" :class="scoreData.summary.silver_pass ? 'score-pass' : 'score-fail'"
+                                 x-text="scoreData.summary.silver_score"></div>
+                            <div class="score-label">
+                                min <span x-text="scoreData.summary.thresholds.silver_min"></span>
+                            </div>
+                        </div>
+                        <div class="card score-tile">
+                            <div class="card-title">Gold</div>
+                            <div class="score-value" :class="scoreData.summary.gold_pass ? 'score-pass' : 'score-fail'"
+                                 x-text="scoreData.summary.gold_score"></div>
+                            <div class="score-label">
+                                min <span x-text="scoreData.summary.thresholds.gold_min"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Findings summary -->
+            <template x-if="checkData">
+                <div class="card section-gap">
+                    <div class="card-title">Health Check Summary</div>
+                    <div style="display: flex; gap: 16px; align-items: center; margin-top: 8px;">
+                        <span class="chip chip-error" @click="filterSeverity = 'ERROR'; screen = 'findings'" style="cursor:pointer;">
+                            <span x-text="checkData.summary.errors"></span> Errors
+                        </span>
+                        <span class="chip chip-warning" @click="filterSeverity = 'WARNING'; screen = 'findings'" style="cursor:pointer;">
+                            <span x-text="checkData.summary.warnings"></span> Warnings
+                        </span>
+                        <span class="chip chip-info" @click="filterSeverity = 'INFO'; screen = 'findings'" style="cursor:pointer;">
+                            <span x-text="checkData.summary.info"></span> Info
+                        </span>
+                        <span style="color: var(--text-dim); font-size: 13px;">
+                            <span x-text="checkData.summary.total"></span> total findings
+                        </span>
+                    </div>
+
+                    <!-- Top 5 findings -->
+                    <template x-if="checkData.findings.length > 0">
+                        <div style="margin-top: 16px;">
+                            <div style="font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px;">Top findings</div>
+                            <template x-for="f in checkData.findings.slice(0, 5)" :key="f.object_path + f.rule">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border);">
+                                    <span class="sev-icon" :class="sevClass(f.severity)" x-text="sevIcon(f.severity)"></span>
+                                    <span style="font-weight: 500;" x-text="f.rule"></span>
+                                    <span style="color: var(--text-dim);" x-text="f.object_path"></span>
+                                    <span style="margin-left: auto; font-size: 13px; color: var(--text-dim);" x-text="f.message"></span>
+                                </div>
+                            </template>
+                            <template x-if="checkData.findings.length > 5">
+                                <button class="btn" style="margin-top: 8px;" @click="screen = 'findings'">
+                                    View all <span x-text="checkData.findings.length"></span> findings
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template x-if="checkData.findings.length === 0">
+                        <div style="margin-top: 12px; color: var(--success); font-weight: 500;">No issues found!</div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Score detail (criteria breakdown) -->
+            <template x-if="scoreData">
+                <div class="section-gap">
+                    <template x-for="[tierName, criteria] in [['Bronze', scoreData.bronze], ['Silver', scoreData.silver], ['Gold', scoreData.gold]]" :key="tierName">
+                        <div class="card" style="margin-bottom: 12px;">
+                            <div class="card-title" x-text="tierName + ' Criteria'"></div>
+                            <template x-for="c in criteria" :key="c.name">
+                                <div style="display: flex; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border);">
+                                    <span x-text="c.score === c.max_score ? '\u2713' : c.score > 0 ? '~' : '\u2717'"
+                                          :style="{ color: c.score === c.max_score ? 'var(--success)' : c.score > 0 ? 'var(--warning)' : 'var(--error)', fontWeight: '700', width: '20px' }"></span>
+                                    <span style="font-weight: 500;" x-text="c.name"></span>
+                                    <span style="color: var(--text-dim); font-size: 13px;" x-text="c.score + '/' + c.max_score"></span>
+                                    <template x-if="c.details.length > 0">
+                                        <span style="color: var(--text-dim); font-size: 12px; margin-left: auto;" x-text="c.details[0]"></span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </section>
+
+        <!-- ===== FINDINGS ===== -->
+        <section x-show="screen === 'findings' && modelLoaded">
+
+            <div class="card">
+                <div class="card-title">
+                    Findings
+                    <template x-if="checkData">
+                        <span style="font-weight: 400; text-transform: none;" x-text="'(' + filteredFindings.length + ' of ' + checkData.summary.total + ')'"></span>
+                    </template>
+                </div>
+
+                <!-- Filter bar -->
+                <div class="filter-bar">
+                    <input type="text" placeholder="Search findings..." x-model="filterSearch">
+                    <select x-model="filterSeverity">
+                        <option value="">All severities</option>
+                        <option value="ERROR">Errors</option>
+                        <option value="WARNING">Warnings</option>
+                        <option value="INFO">Info</option>
+                    </select>
+                    <select x-model="filterRule">
+                        <option value="">All rules</option>
+                        <template x-for="r in uniqueRules" :key="r">
+                            <option :value="r" x-text="r"></option>
+                        </template>
+                    </select>
+                    <select x-model="filterTable">
+                        <option value="">All tables</option>
+                        <template x-for="t in uniqueTables" :key="t">
+                            <option :value="t" x-text="t"></option>
+                        </template>
+                    </select>
+                    <button class="btn" @click="clearFilters()">Clear</button>
+                </div>
+
+                <!-- Table -->
+                <template x-if="filteredFindings.length > 0">
+                    <table class="findings-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>Severity</th>
+                                <th>Rule</th>
+                                <th>Object</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(f, idx) in filteredFindings" :key="idx">
+                                <tr>
+                                    <td><span class="sev-icon" :class="sevClass(f.severity)" x-text="sevIcon(f.severity)"></span></td>
+                                    <td x-text="f.severity"></td>
+                                    <td style="font-weight: 500;" x-text="f.rule"></td>
+                                    <td style="color: var(--text-dim);" x-text="f.object_path"></td>
+                                    <td>
+                                        <div x-text="f.message"></div>
+                                        <template x-if="f.recommendation">
+                                            <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;" x-text="f.recommendation"></div>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </template>
+
+                <template x-if="filteredFindings.length === 0 && checkData">
+                    <div class="empty-state">
+                        <p>No findings match your filters.</p>
+                    </div>
+                </template>
+            </div>
+        </section>
+
+        <!-- ===== SETTINGS ===== -->
+        <section x-show="screen === 'settings'">
+
+            <div class="card">
+                <div class="card-title">Model Path</div>
+                <template x-if="modelPath">
+                    <div style="margin-bottom: 12px;">
+                        <span style="font-weight: 500;">Current:</span>
+                        <span x-text="modelPath"></span>
+                    </div>
+                </template>
+
+                <!-- Breadcrumb -->
+                <div style="font-size: 13px; color: var(--text-dim); margin-bottom: 8px;" x-text="browseCurrent"></div>
+
+                <!-- Navigation buttons -->
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn" @click="browse(browseParent)" :disabled="!browseParent">Up</button>
+                    <button class="btn" @click="browse(null)">Home</button>
+                </div>
+
+                <!-- Directory listing -->
+                <ul class="browser-list">
+                    <template x-for="entry in browseEntries.filter(e => e.is_dir)" :key="entry.path">
+                        <li class="browser-item" :class="{ 'browser-model': entry.is_model }" @click="entry.is_model ? setModelPath(entry.path) : browse(entry.path)">
+                            <span class="icon" x-text="entry.is_model ? '\u2605' : '\uD83D\uDCC1'"></span>
+                            <span x-text="entry.name"></span>
+                            <template x-if="entry.is_model">
+                                <button class="btn btn-primary" style="margin-left: auto; padding: 4px 12px; font-size: 12px;" @click.stop="setModelPath(entry.path)">Open</button>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+
+                <template x-if="browseEntries.filter(e => e.is_dir).length === 0">
+                    <div class="empty-state" style="padding: 24px;">No subdirectories found.</div>
+                </template>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
