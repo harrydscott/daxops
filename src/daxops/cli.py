@@ -931,3 +931,23 @@ def app(port: int, model_path: str | None, no_browser: bool):
     console.print("  Press Ctrl+C to stop.\n")
 
     uvicorn.run(application, host="127.0.0.1", port=port, log_level="warning")
+
+
+@cli.command("register-tool")
+@click.option("--path", "tool_path", default=None, help="Override External Tools folder path")
+@click.option("--uninstall", is_flag=True, help="Remove DaxOps from External Tools")
+def register_tool(tool_path: str | None, uninstall: bool):
+    """Register DaxOps as a Power BI Desktop External Tool."""
+    from daxops.register import register_tool as do_register, unregister_tool
+
+    if uninstall:
+        result = unregister_tool(tool_path)
+        if result:
+            console.print(f"[green]Removed[/green] {result}")
+        else:
+            console.print("[yellow]DaxOps.pbitool.json not found — nothing to remove.")
+    else:
+        result = do_register(tool_path)
+        console.print(f"[green]Registered[/green] DaxOps as External Tool")
+        console.print(f"  File: {result}")
+        console.print("  Restart Power BI Desktop to see DaxOps in the External Tools ribbon.")
