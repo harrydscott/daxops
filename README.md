@@ -299,6 +299,16 @@ The workflow automatically:
 - Uploads JSON artifacts for downstream use
 - Fails the build if thresholds are breached
 
+### Azure DevOps Pipelines
+
+Copy `azure-pipelines-daxops.yml` to your repo. It auto-detects your model path, runs score + check, and publishes JSON artifacts:
+
+```yaml
+# azure-pipelines-daxops.yml (included in this repo)
+# Triggers on changes to *.tmdl or .daxops.yml files
+# Configurable via the modelPath parameter
+```
+
 ### Pre-commit Hook
 
 Add DaxOps to your `.pre-commit-config.yaml`:
@@ -339,6 +349,17 @@ DaxOps ships with a Contoso Sales sample model containing intentional issues:
 daxops score samples/contoso-sales/
 daxops check samples/contoso-sales/
 ```
+
+## VS Code Extension
+
+A VS Code extension stub is included in `vscode-daxops/`. It provides:
+
+- 8 commands accessible via Command Palette (Score, Check, Fix, Report, Watch, Badge, Baseline)
+- TMDL language registration (`.tmdl` file type)
+- Run-on-save option for automatic health checks
+- Auto-detection of TMDL models in workspace
+
+See [`vscode-daxops/README.md`](vscode-daxops/README.md) for setup instructions.
 
 ## Development
 
