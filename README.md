@@ -85,6 +85,9 @@ daxops scan "My Workspace" "My Dataset" --output model.json
 daxops app --model-path ./my-model/
 daxops app                             # opens folder picker in browser
 
+# Register as Power BI Desktop External Tool (Windows)
+daxops register-tool
+
 # Create a sample model to try it out
 daxops init ./sample/
 ```
@@ -114,6 +117,43 @@ The web app provides:
 - **Re-scan** — refresh model data without restarting the server
 
 No build step required. The frontend uses Alpine.js and is served directly by FastAPI.
+
+## Power BI Desktop External Tool (Windows)
+
+DaxOps can register as a Power BI Desktop External Tool, appearing in the External Tools ribbon. When launched from PBI Desktop, it connects to the live model via the local Analysis Services instance.
+
+### Setup
+
+```bash
+# Register DaxOps as an External Tool
+daxops register-tool
+
+# Remove registration
+daxops register-tool --uninstall
+
+# Custom External Tools folder path
+daxops register-tool --path "C:\Custom\Path"
+```
+
+After registering, restart Power BI Desktop. DaxOps will appear in the **External Tools** ribbon. Clicking it launches the web app connected to your currently-open model.
+
+### Connection Modes
+
+| Mode | Read Source | Write Target | How |
+|------|-----------|-------------|-----|
+| **TMDL** | Files on disk | Files on disk | `daxops app --model-path ./my-model/` |
+| **SSAS** | PBI Desktop (live) | Read-only | `daxops app --ssas-server localhost:12345 --database MyModel` |
+| **Hybrid** | PBI Desktop (live) | Files on disk | Both `--ssas-server` and `--model-path` provided |
+
+**Hybrid mode** is recommended when using the External Tool: the live model is read from SSAS (always up-to-date), while fixes are written to TMDL files on disk (safe, versioned, undo-able). PBI Desktop detects file changes and prompts you to reload.
+
+DaxOps automatically detects the TMDL project folder from the SSAS workspace when possible. If auto-detection fails, set the model path in Settings or pass `--model-path`.
+
+### Requirements
+
+- **Windows only** — Power BI Desktop and SSAS are Windows-only
+- **pyadomd** — `pip install daxops[xmla]` for SSAS connectivity
+- TMDL folder mode works on any OS without pyadomd
 
 ## PBIP Project Support
 
