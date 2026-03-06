@@ -47,6 +47,21 @@ function daxops() {
         // Score detail
         scoreDetailOpen: { Bronze: true, Silver: false, Gold: false },
 
+        // AI Description Editor
+        aiSettings: null,
+        aiProvider: 'openai',
+        aiModel: 'gpt-4o',
+        aiAzureEndpoint: '',
+        aiApiKey: '',
+        aiTestResult: null,
+        aiTesting: false,
+        descObjects: [],
+        descGenerating: false,
+        descProgress: { current: 0, total: 0 },
+        descFilter: '',  // filter by type: '', 'measure', 'column', 'table'
+        descStatusFilter: '',  // filter by status
+        descSearch: '',
+
         async init() {
             await this.loadSettings();
             if (this.modelPath) {
@@ -151,7 +166,10 @@ function daxops() {
 
         async openSettings() {
             this.screen = 'settings';
-            await this.browse(this.modelPath || null);
+            await Promise.all([
+                this.browse(this.modelPath || null),
+                this.loadAISettings(),
+            ]);
         },
 
         // --- Fix workflow ---
@@ -247,6 +265,275 @@ function daxops() {
             } catch (e) {
                 this.error = e.message;
             }
+        },
+
+        // --- AI Provider Settings ---
+        async loadAISettings() {
+            try {
+                const data = await this.api('/api/ai/settings');
+                this.aiSettings = data;
+                this.aiProvider = data.provider;
+                this.aiModel = data.llm_model;
+                this.aiAzureEndpoint = data.azure_endpoint || '';
+            } catch (e) { /* ignore */ }
+        },
+
+        async saveAISettings() {
+            this.error = null;
+            try {
+                const data = await this.api('/api/ai/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider: this.aiProvider,
+                        llm_model: this.aiModel,
+                        azure_endpoint: this.aiAzureEndpoint || null,
+                    }),
+                });
+                this.aiSettings = data;
+                // Save API key if provided
+                if (this.aiApiKey) {
+                    await this.api('/api/ai/key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            provider: this.aiProvider,
+                            api_key: this.aiApiKey,
+                        }),
+                    });
+                    this.aiApiKey = '';  // Clear from UI
+                    await this.loadAISettings();
+                }
+                this.showToast('AI settings saved.');
+            } catch (e) {
+                this.error = e.message;
+            }
+        },
+
+        async testAIConnection() {
+            this.aiTesting = true;
+            this.aiTestResult = null;
+            try {
+                // Save settings first
+                await this.saveAISettings();
+                const data = await this.api('/api/ai/test', { method: 'POST' });
+                this.aiTestResult = data;
+            } catch (e) {
+                this.aiTestResult = { success: false, message: e.message };
+            }
+            this.aiTesting = false;
+        },
+
+        // --- AI Description Editor ---
+        async openDescribeScreen() {
+            this.screen = 'describe';
+            await this.loadUndocumented();
+        },
+
+        async loadUndocumented() {
+            this.error = null;
+            try {
+                const data = await this.api('/api/document/undocumented');
+                this.descObjects = data.objects;
+            } catch (e) {
+                this.error = e.message;
+            }
+        },
+
+        get filteredDescObjects() {
+            let objs = this.descObjects;
+            if (this.descFilter) {
+                objs = objs.filter(o => o.object_type === this.descFilter);
+            }
+            if (this.descStatusFilter) {
+                objs = objs.filter(o => o.status === this.descStatusFilter);
+            }
+            if (this.descSearch) {
+                const term = this.descSearch.toLowerCase();
+                objs = objs.filter(o =>
+                    o.name.toLowerCase().includes(term) ||
+                    o.object_path.toLowerCase().includes(term) ||
+                    (o.description || '').toLowerCase().includes(term)
+                );
+            }
+            return objs;
+        },
+
+        get descStats() {
+            const total = this.descObjects.length;
+            const generated = this.descObjects.filter(o => o.status === 'generated').length;
+            const edited = this.descObjects.filter(o => o.status === 'edited').length;
+            const approved = this.descObjects.filter(o => o.status === 'approved').length;
+            const written = this.descObjects.filter(o => o.status === 'written').length;
+            const pending = this.descObjects.filter(o => o.status === 'not_generated').length;
+            return { total, generated, edited, approved, written, pending };
+        },
+
+        async generateDescriptions(paths) {
+            this.descGenerating = true;
+            this.descProgress = { current: 0, total: paths ? paths.length : this.descObjects.length };
+            this.error = null;
+            try {
+                // Try WebSocket first for real-time progress
+                const wsUrl = `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/progress`;
+                const ws = new WebSocket(wsUrl);
+                const self = this;
+                let resolved = false;
+
+                await new Promise((resolve, reject) => {
+                    ws.onopen = () => {
+                        ws.send(JSON.stringify({
+                            action: 'generate',
+                            object_paths: paths || null,
+                        }));
+                    };
+                    ws.onmessage = (e) => {
+                        const msg = JSON.parse(e.data);
+                        if (msg.type === 'start') {
+                            self.descProgress.total = msg.total;
+                        } else if (msg.type === 'progress') {
+                            self.descProgress.current = msg.current;
+                            // Update the object in our list
+                            const idx = self.descObjects.findIndex(o => o.object_path === msg.item.object_path);
+                            if (idx >= 0) {
+                                self.descObjects[idx] = msg.item;
+                            }
+                        } else if (msg.type === 'complete') {
+                            resolved = true;
+                            ws.close();
+                            resolve();
+                        }
+                    };
+                    ws.onerror = () => {
+                        // Fallback to HTTP if WebSocket fails
+                        if (!resolved) {
+                            ws.close();
+                            self._generateViaHttp(paths).then(resolve).catch(reject);
+                        }
+                    };
+                    ws.onclose = () => {
+                        if (!resolved) resolve();
+                    };
+                });
+
+                await this.loadUndocumented();
+                this.showToast(`Generated ${this.descProgress.current} descriptions.`);
+            } catch (e) {
+                this.error = e.message;
+            }
+            this.descGenerating = false;
+        },
+
+        async _generateViaHttp(paths) {
+            const data = await this.api('/api/document/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ object_paths: paths || null }),
+            });
+            this.descProgress.current = data.total;
+        },
+
+        async generateAll() {
+            await this.generateDescriptions(null);
+        },
+
+        async generateSelected(paths) {
+            await this.generateDescriptions(paths);
+        },
+
+        async regenerateOne(path) {
+            await this.generateDescriptions([path]);
+        },
+
+        async updateDescription(obj, newDesc) {
+            try {
+                const data = await this.api('/api/document/description', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        object_path: obj.object_path,
+                        description: newDesc,
+                        status: 'edited',
+                    }),
+                });
+                const idx = this.descObjects.findIndex(o => o.object_path === obj.object_path);
+                if (idx >= 0) this.descObjects[idx] = data;
+            } catch (e) {
+                this.error = e.message;
+            }
+        },
+
+        async approveOne(path) {
+            try {
+                await this.api('/api/document/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ object_paths: [path] }),
+                });
+                const idx = this.descObjects.findIndex(o => o.object_path === path);
+                if (idx >= 0) this.descObjects[idx].status = 'approved';
+            } catch (e) {
+                this.error = e.message;
+            }
+        },
+
+        async approveAll() {
+            const paths = this.descObjects
+                .filter(o => o.status === 'generated' || o.status === 'edited')
+                .map(o => o.object_path);
+            if (!paths.length) return;
+            try {
+                await this.api('/api/document/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ object_paths: paths }),
+                });
+                for (const p of paths) {
+                    const idx = this.descObjects.findIndex(o => o.object_path === p);
+                    if (idx >= 0) this.descObjects[idx].status = 'approved';
+                }
+                this.showToast(`Approved ${paths.length} descriptions.`);
+            } catch (e) {
+                this.error = e.message;
+            }
+        },
+
+        async writeApproved() {
+            this.loading = true;
+            this.error = null;
+            try {
+                const data = await this.api('/api/document/write', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}),
+                });
+                this.showToast(data.message);
+                await this.loadUndocumented();
+                await this.fullScan();
+            } catch (e) {
+                this.error = e.message;
+            }
+            this.loading = false;
+        },
+
+        descStatusLabel(status) {
+            return {
+                'not_generated': 'Pending',
+                'generated': 'Generated',
+                'edited': 'Edited',
+                'approved': 'Approved',
+                'written': 'Written',
+            }[status] || status;
+        },
+
+        descStatusClass(status) {
+            return {
+                'not_generated': 'desc-pending',
+                'generated': 'desc-generated',
+                'edited': 'desc-edited',
+                'approved': 'desc-approved',
+                'written': 'desc-written',
+            }[status] || '';
         },
 
         // --- Score detail ---

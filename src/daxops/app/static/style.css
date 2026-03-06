@@ -552,6 +552,101 @@ body {
     width: 100%;
 }
 
+/* AI Description Editor */
+.desc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.desc-item {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.desc-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.desc-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--bg);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+}
+
+.desc-expression {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--bg);
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+.desc-textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.desc-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.desc-textarea:disabled {
+    background: var(--bg);
+    color: var(--text-dim);
+}
+
+.desc-actions {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Description status chips */
+.desc-pending { background: #f5f5f5; color: var(--text-dim); }
+.desc-generated { background: #e3f2fd; color: var(--info); }
+.desc-edited { background: #fff3e0; color: var(--warning); }
+.desc-approved { background: #e8f5e9; color: var(--success); }
+.desc-written { background: #f3e5f5; color: #7b1fa2; }
+
+/* Progress bar */
+.progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
 @media (max-width: 768px) {
     .diff-view { grid-template-columns: 1fr; }
     .threshold-grid { grid-template-columns: 1fr; }

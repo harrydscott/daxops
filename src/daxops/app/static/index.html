@@ -22,6 +22,7 @@
             <button :class="{ active: screen === 'dashboard' }" @click="screen = 'dashboard'">Dashboard</button>
             <button :class="{ active: screen === 'findings' }" @click="screen = 'findings'">Findings</button>
             <button :class="{ active: screen === 'score-detail' }" @click="screen = 'score-detail'">Score</button>
+            <button :class="{ active: screen === 'describe' }" @click="openDescribeScreen()">Describe</button>
             <button :class="{ active: screen === 'settings' }" @click="openSettings()">Settings</button>
         </nav>
         <div class="header-right">
@@ -390,9 +391,209 @@
                 </div>
             </div>
 
+            <!-- AI Provider -->
+            <div class="card section-gap">
+                <div class="card-title">AI Provider</div>
+                <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 12px;">Configure the LLM provider for AI-generated descriptions. API keys are stored in your OS keychain.</p>
+
+                <div class="threshold-grid" style="margin-bottom: 12px;">
+                    <label>
+                        <span>Provider</span>
+                        <select x-model="aiProvider" style="padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; width: 100%;">
+                            <option value="openai">OpenAI</option>
+                            <option value="azure_openai">Azure OpenAI</option>
+                            <option value="anthropic">Anthropic</option>
+                        </select>
+                    </label>
+                    <label>
+                        <span>Model</span>
+                        <input type="text" x-model="aiModel" placeholder="e.g. gpt-4o" style="padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; width: 100%;">
+                    </label>
+                    <label>
+                        <span>API Key</span>
+                        <input type="password" x-model="aiApiKey" placeholder="Enter to update..." style="padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; width: 100%;">
+                    </label>
+                </div>
+
+                <template x-if="aiProvider === 'azure_openai'">
+                    <div style="margin-bottom: 12px;">
+                        <label>
+                            <span style="font-size: 13px; font-weight: 500;">Azure Endpoint</span>
+                            <input type="text" x-model="aiAzureEndpoint" placeholder="https://myresource.openai.azure.com" style="padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; width: 100%; margin-top: 4px;">
+                        </label>
+                    </div>
+                </template>
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn btn-primary" @click="saveAISettings()">Save AI Settings</button>
+                    <button class="btn" @click="testAIConnection()" :disabled="aiTesting">
+                        <span x-show="aiTesting" class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></span>
+                        Test Connection
+                    </button>
+                    <template x-if="aiSettings && aiSettings.has_api_key">
+                        <span style="font-size: 12px; color: var(--success);">Key stored</span>
+                    </template>
+                </div>
+
+                <template x-if="aiTestResult">
+                    <div style="margin-top: 8px; font-size: 13px; padding: 8px 12px; border-radius: var(--radius);"
+                         :style="aiTestResult.success ? 'background: #e8f5e9; color: var(--success);' : 'background: #fce4e4; color: var(--error);'"
+                         x-text="aiTestResult.message"></div>
+                </template>
+            </div>
+
             <!-- Save button -->
             <div style="margin-top: 16px;">
                 <button class="btn btn-primary" @click="saveSettings()">Save Settings</button>
+            </div>
+        </section>
+
+        <!-- ===== AI DESCRIPTION EDITOR ===== -->
+        <section x-show="screen === 'describe' && modelLoaded">
+
+            <div class="card">
+                <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+                    <span>
+                        AI Description Editor
+                        <span style="font-weight: 400; text-transform: none;" x-text="'(' + descObjects.length + ' undocumented)'"></span>
+                    </span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn" @click="approveAll()" :disabled="descStats.generated + descStats.edited === 0">
+                            Approve All
+                        </button>
+                        <button class="btn btn-primary" @click="writeApproved()" :disabled="descStats.approved === 0 || loading">
+                            <span x-show="loading" class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></span>
+                            Write <span x-text="descStats.approved"></span> to Model
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress bar -->
+                <template x-if="descGenerating">
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <span class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></span>
+                            <span style="font-size: 13px; color: var(--text-dim);"
+                                  x-text="'Generating ' + descProgress.current + '/' + descProgress.total + '...'"></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" :style="'width: ' + (descProgress.total ? (descProgress.current / descProgress.total * 100) : 0) + '%'"></div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Status summary chips -->
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+                    <span class="chip desc-pending" style="cursor: pointer;" @click="descStatusFilter = descStatusFilter === 'not_generated' ? '' : 'not_generated'">
+                        <span x-text="descStats.pending"></span> Pending
+                    </span>
+                    <span class="chip desc-generated" style="cursor: pointer;" @click="descStatusFilter = descStatusFilter === 'generated' ? '' : 'generated'">
+                        <span x-text="descStats.generated"></span> Generated
+                    </span>
+                    <span class="chip desc-edited" style="cursor: pointer;" @click="descStatusFilter = descStatusFilter === 'edited' ? '' : 'edited'">
+                        <span x-text="descStats.edited"></span> Edited
+                    </span>
+                    <span class="chip desc-approved" style="cursor: pointer;" @click="descStatusFilter = descStatusFilter === 'approved' ? '' : 'approved'">
+                        <span x-text="descStats.approved"></span> Approved
+                    </span>
+                    <span class="chip desc-written" style="cursor: pointer;" @click="descStatusFilter = descStatusFilter === 'written' ? '' : 'written'">
+                        <span x-text="descStats.written"></span> Written
+                    </span>
+                    <button class="btn btn-primary" style="margin-left: auto;" @click="generateAll()" :disabled="descGenerating || descStats.pending === 0">
+                        <span x-show="descGenerating" class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></span>
+                        Generate All
+                    </button>
+                </div>
+
+                <!-- Filter bar -->
+                <div class="filter-bar">
+                    <input type="text" placeholder="Search objects..." x-model="descSearch">
+                    <select x-model="descFilter">
+                        <option value="">All types</option>
+                        <option value="measure">Measures</option>
+                        <option value="column">Columns</option>
+                        <option value="table">Tables</option>
+                    </select>
+                    <select x-model="descStatusFilter">
+                        <option value="">All statuses</option>
+                        <option value="not_generated">Pending</option>
+                        <option value="generated">Generated</option>
+                        <option value="edited">Edited</option>
+                        <option value="approved">Approved</option>
+                        <option value="written">Written</option>
+                    </select>
+                </div>
+
+                <!-- Description items -->
+                <template x-if="filteredDescObjects.length > 0">
+                    <div class="desc-list">
+                        <template x-for="obj in filteredDescObjects" :key="obj.object_path">
+                            <div class="desc-item">
+                                <div class="desc-item-header">
+                                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                                        <span class="desc-type-badge" x-text="obj.object_type"></span>
+                                        <span style="font-weight: 500;" x-text="obj.name"></span>
+                                        <span style="font-size: 12px; color: var(--text-dim);" x-text="obj.table_name"></span>
+                                    </div>
+                                    <span class="chip" :class="descStatusClass(obj.status)" x-text="descStatusLabel(obj.status)"></span>
+                                </div>
+
+                                <!-- Expression preview for measures -->
+                                <template x-if="obj.expression">
+                                    <pre class="desc-expression" x-text="obj.expression"></pre>
+                                </template>
+
+                                <!-- Description field -->
+                                <template x-if="obj.status !== 'not_generated'">
+                                    <div style="margin-top: 8px;">
+                                        <textarea class="desc-textarea"
+                                            x-model="obj.description"
+                                            @change="updateDescription(obj, obj.description)"
+                                            :disabled="obj.status === 'written'"
+                                            rows="2"></textarea>
+                                    </div>
+                                </template>
+
+                                <!-- Action buttons -->
+                                <div class="desc-actions">
+                                    <template x-if="obj.status === 'not_generated'">
+                                        <button class="btn" @click="regenerateOne(obj.object_path)" :disabled="descGenerating" style="font-size: 12px; padding: 4px 10px;">
+                                            Generate
+                                        </button>
+                                    </template>
+                                    <template x-if="obj.status === 'generated' || obj.status === 'edited'">
+                                        <div style="display: flex; gap: 6px;">
+                                            <button class="btn btn-primary" @click="approveOne(obj.object_path)" style="font-size: 12px; padding: 4px 10px;">
+                                                Approve
+                                            </button>
+                                            <button class="btn" @click="regenerateOne(obj.object_path)" :disabled="descGenerating" style="font-size: 12px; padding: 4px 10px;">
+                                                Regenerate
+                                            </button>
+                                        </div>
+                                    </template>
+                                    <template x-if="obj.status === 'approved'">
+                                        <span style="font-size: 12px; color: var(--success);">Ready to write</span>
+                                    </template>
+                                    <template x-if="obj.status === 'written'">
+                                        <span style="font-size: 12px; color: var(--success);">Written to model</span>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <template x-if="descObjects.length === 0">
+                    <div class="empty-state">
+                        <p>All objects are documented! Nothing to do.</p>
+                    </div>
+                </template>
+
+                <template x-if="descObjects.length > 0 && filteredDescObjects.length === 0">
+                    <div class="empty-state">
+                        <p>No objects match your filters.</p>
+                    </div>
+                </template>
             </div>
         </section>
 

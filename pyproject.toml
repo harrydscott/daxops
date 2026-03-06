@@ -28,7 +28,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-llm = ["openai>=1.0"]
+llm = ["openai>=1.0", "anthropic>=0.18", "keyring>=25.0"]
 xmla = ["pyadomd>=0.1.0", "azure-identity>=1.14"]
 fabric = ["semantic-link-sempy>=0.7.0"]
 dev = ["pytest>=7.0", "pytest-cov", "httpx>=0.25"]
