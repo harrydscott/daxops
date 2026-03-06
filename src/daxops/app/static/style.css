@@ -357,3 +357,202 @@ body {
 }
 
 .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    padding: 12px 20px;
+    background: var(--success);
+    color: white;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1000;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 900px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+}
+
+/* Fix items */
+.fix-item {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+}
+
+.fix-item.fix-deselected {
+    opacity: 0.5;
+}
+
+.manual-fix-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.manual-fix-item:last-child { border-bottom: none; }
+
+/* Diff view */
+.diff-view {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.diff-pane {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: auto;
+    max-height: 200px;
+}
+
+.diff-pane pre {
+    padding: 8px 12px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 0;
+}
+
+.diff-label {
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+}
+
+.diff-before { border-color: #fecaca; }
+.diff-before .diff-label { background: #fef2f2; color: var(--error); }
+.diff-after { border-color: #bbf7d0; }
+.diff-after .diff-label { background: #f0fdf4; color: var(--success); }
+
+/* Pass/fail chips */
+.chip-pass { background: #e8f5e9; color: var(--success); }
+.chip-fail { background: #fce4e4; color: var(--error); }
+
+/* Score detail */
+.criterion-row {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.criterion-row:last-child { border-bottom: none; }
+
+.score-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+}
+
+/* Settings: rule toggles */
+.rule-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+}
+
+.rule-toggle:last-child { border-bottom: none; }
+
+.rule-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Threshold grid */
+.threshold-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.threshold-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.threshold-grid input[type="number"] {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .diff-view { grid-template-columns: 1fr; }
+    .threshold-grid { grid-template-columns: 1fr; }
+}

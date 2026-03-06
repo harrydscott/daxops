@@ -219,6 +219,36 @@ class TestSettingsEndpoint:
         assert client.get("/api/score").status_code == 200
         assert client.get("/api/check").status_code == 200
 
+    def test_settings_includes_rules_and_thresholds(self, client):
+        data = client.get("/api/settings").json()
+        assert "exclude_rules" in data
+        assert "thresholds" in data
+        assert isinstance(data["exclude_rules"], list)
+        assert "bronze_min" in data["thresholds"]
+
+    def test_set_rules_config(self, client_with_model):
+        resp = client_with_model.put("/api/settings/rules", json={
+            "exclude_rules": ["NAMING_CONVENTION"],
+            "thresholds": {"bronze_min": 5, "silver_min": 5, "gold_min": 5},
+        })
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "NAMING_CONVENTION" in data["exclude_rules"]
+        assert data["thresholds"]["bronze_min"] == 5
+
+    def test_set_rules_config_affects_check(self, client_with_model):
+        # Get all findings
+        all_findings = client_with_model.get("/api/check").json()["findings"]
+        naming_count = sum(1 for f in all_findings if f["rule"] == "NAMING_CONVENTION")
+        # Exclude NAMING_CONVENTION
+        client_with_model.put("/api/settings/rules", json={
+            "exclude_rules": ["NAMING_CONVENTION"],
+            "thresholds": {"bronze_min": 10, "silver_min": 10, "gold_min": 8},
+        })
+        filtered = client_with_model.get("/api/check").json()["findings"]
+        assert all(f["rule"] != "NAMING_CONVENTION" for f in filtered)
+        assert len(filtered) == len(all_findings) - naming_count
+
 
 # ---- /api/browse ----
 

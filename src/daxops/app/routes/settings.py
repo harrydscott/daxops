@@ -15,6 +15,8 @@ router = APIRouter()
 class SettingsResponse(BaseModel):
     model_path: str | None
     model_loaded: bool
+    exclude_rules: list[str]
+    thresholds: dict[str, int]
 
 
 class SetModelPathRequest(BaseModel):
@@ -34,13 +36,24 @@ class BrowseResponse(BaseModel):
     entries: list[DirectoryEntry]
 
 
-@router.get("/settings", response_model=SettingsResponse)
-def get_settings() -> SettingsResponse:
-    """Return current settings."""
+def _settings_response() -> SettingsResponse:
+    cfg = app_state.config
     return SettingsResponse(
         model_path=app_state.model_path,
         model_loaded=app_state.model is not None,
+        exclude_rules=cfg.exclude_rules,
+        thresholds={
+            "bronze_min": cfg.score.bronze_min,
+            "silver_min": cfg.score.silver_min,
+            "gold_min": cfg.score.gold_min,
+        },
     )
+
+
+@router.get("/settings", response_model=SettingsResponse)
+def get_settings() -> SettingsResponse:
+    """Return current settings."""
+    return _settings_response()
 
 
 @router.put("/settings/model-path", response_model=SettingsResponse)
@@ -51,10 +64,25 @@ def set_model_path(req: SetModelPathRequest) -> SettingsResponse:
         raise HTTPException(status_code=400, detail=f"Path does not exist: {path}")
     app_state.set_model_path(path)
     app_state.scan()
-    return SettingsResponse(
-        model_path=app_state.model_path,
-        model_loaded=app_state.model is not None,
-    )
+    return _settings_response()
+
+
+class RulesConfigRequest(BaseModel):
+    exclude_rules: list[str]
+    thresholds: dict[str, int]
+
+
+@router.put("/settings/rules", response_model=SettingsResponse)
+def set_rules_config(req: RulesConfigRequest) -> SettingsResponse:
+    """Update rule exclusions and score thresholds."""
+    app_state.config.exclude_rules = req.exclude_rules
+    if "bronze_min" in req.thresholds:
+        app_state.config.score.bronze_min = req.thresholds["bronze_min"]
+    if "silver_min" in req.thresholds:
+        app_state.config.score.silver_min = req.thresholds["silver_min"]
+    if "gold_min" in req.thresholds:
+        app_state.config.score.gold_min = req.thresholds["gold_min"]
+    return _settings_response()
 
 
 @router.get("/browse", response_model=BrowseResponse)
