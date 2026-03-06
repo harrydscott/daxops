@@ -27,6 +27,8 @@ dependencies = [
 
 [project.optional-dependencies]
 llm = ["openai>=1.0"]
+xmla = ["pyadomd>=0.1.0", "azure-identity>=1.14"]
+fabric = ["sempy-fabric>=0.1.0"]
 dev = ["pytest>=7.0", "pytest-cov"]
 
 [project.scripts]

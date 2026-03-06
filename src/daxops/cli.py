@@ -726,6 +726,68 @@ def badge(ctx, model_path: str, output: str | None, style: str, fmt: str):
 
 
 @cli.command()
+@click.argument("workspace")
+@click.argument("dataset")
+@click.option("--connection-string", default=None, help="Full XMLA connection string (overrides workspace/dataset)")
+@click.option("--tenant-id", envvar="AZURE_TENANT_ID", default="", help="Azure AD tenant ID")
+@click.option("--client-id", envvar="AZURE_CLIENT_ID", default="", help="Azure AD client/app ID")
+@click.option("--client-secret", envvar="AZURE_CLIENT_SECRET", default="", help="Azure AD client secret")
+@click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
+@click.option("--output", "-o", type=click.Path(), default=None, help="Save model as JSON file")
+@click.pass_context
+def scan(ctx, workspace: str, dataset: str, connection_string: str | None,
+         tenant_id: str, client_id: str, client_secret: str, fmt: str, output: str | None):
+    """Scan a live Power BI dataset via XMLA endpoint.
+
+    Connects to Power BI service, pulls model metadata (tables, columns,
+    measures, relationships), and converts to the same internal model as
+    the TMDL parser. Results can be scored, checked, and reported on.
+
+    Requires pyadomd or sempy-fabric:
+      pip install daxops[xmla]    # pyadomd + azure-identity
+      pip install daxops[fabric]  # sempy-fabric
+    """
+    from daxops.xmla import XmlaConnection, scan_xmla
+
+    conn = XmlaConnection(
+        workspace=workspace,
+        dataset=dataset,
+        connection_string=connection_string or "",
+        tenant_id=tenant_id,
+        client_id=client_id,
+        client_secret=client_secret,
+    )
+
+    show_progress = fmt == "terminal"
+    with progress_status(console, "Connecting to XMLA endpoint...", enabled=show_progress):
+        model = scan_xmla(conn)
+
+    model_dict = model.model_dump()
+
+    if output:
+        Path(output).write_text(json.dumps(model_dict, indent=2), encoding="utf-8")
+        if fmt != "json":
+            console.print(f"[green]Model saved to {output}")
+
+    if fmt == "json":
+        click.echo(json.dumps(model_dict, indent=2))
+    else:
+        table_ct = len(model.tables)
+        col_ct = sum(len(t.columns) for t in model.tables)
+        meas_ct = sum(len(t.measures) for t in model.tables)
+        rel_ct = len(model.relationships)
+
+        console.print(f"\n[bold]Scanned: {model.name}")
+        console.print(f"  Tables:        {table_ct}")
+        console.print(f"  Columns:       {col_ct}")
+        console.print(f"  Measures:      {meas_ct}")
+        console.print(f"  Relationships: {rel_ct}")
+
+        if not output:
+            console.print("\n[dim]Tip: use --output model.json to save, then score/check the JSON.[/dim]")
+
+
+@cli.command()
 @click.argument("before_path", type=click.Path(exists=True))
 @click.argument("after_path", type=click.Path(exists=True))
 @click.option("--format", "fmt", type=click.Choice(["terminal", "json"]), default="terminal")
