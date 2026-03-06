@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from daxops import __version__
-from daxops.app.routes import info, score, check, scan, settings
+from daxops.app.routes import info, score, check, scan, settings, fix
 
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -27,6 +27,7 @@ def create_app(model_path: str | None = None) -> FastAPI:
     app.include_router(check.router, prefix="/api")
     app.include_router(scan.router, prefix="/api")
     app.include_router(settings.router, prefix="/api")
+    app.include_router(fix.router, prefix="/api")
 
     # Set initial model path if provided
     if model_path:
